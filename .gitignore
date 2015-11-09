@@ -31,3 +31,6 @@ npm-debug.log
 
 # webstorm base folder
 .idea/
+
+# database config file
+database_config.json
