@@ -23,30 +23,12 @@ var DB = {
     },
 
     find: function (obj, callback) {
-        var union = function(obj, callback) {
-            var iserror = false;
-            var finished = obj.length();
-            var docs = [];
-            for (x in obj) {
-                this.find(obj[x], function(err, res) {
-                    if (err) {
-                        if (!iserror) {
-                            iserror = true;
-                            callback(err, []);
-                        }
-                    } else if (!iserror) {
-                        finished -= 1;
-                        docs.append(res);
-                        if (finished === 0) {
-                            callback(null, docs);
-                        }
-                    }
-                });
-            }
-        };
+        if (!callback) {
+            callback = function () {};
+        }
 
-        if (id in obj) {
-            client.hgetall(this.name + "_" + id, function(err, res) {
+        if ("pk" in obj) {
+            client.hgetall(this.name + "_" + obj["pk"], function(err, res) {
                 if (err) {
                     callback(err, []);
                 } else {
@@ -54,10 +36,10 @@ var DB = {
                 }
             });
         } else {
-            var cmd = "";
-            for (attr in obj) {
+            var cmd = [];
+            for (var attr in obj) {
                 if (attr[0] != '$') {
-                    cmd  = cmd + " " + this.name + "_" + attr + "_" + obj[attr];
+                    cmd.push(this.name + "_" + attr + "_" + obj[attr]);
                 } else {
                     if (attr === "$or") {
                         //TODO
@@ -69,10 +51,13 @@ var DB = {
                 if (err) {
                     callback(err, []);
                 } else {
+                    if (res.length() === 0) {
+                        callback(null, []);
+                    }
                     var docs = [];
                     var iserror = false;
                     var finished = 0;
-                    for (x in res) finished += 1;
+                    finished = res.length();
                     for (x in res) {
                         client.hgetall(res[x], function(err, res) {
                             if (err) {
