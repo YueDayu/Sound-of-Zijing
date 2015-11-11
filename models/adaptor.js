@@ -65,7 +65,8 @@ var DB = {
                 } else {
                     var docs = [];
                     var iserror = false;
-                    var finished = res.length;
+                    var finished = 0;
+                    finished = res.length;
                     for (x in res) {
                         client.hgetall(res[x], function(err, resobj) {
                             if (err) {
@@ -90,14 +91,18 @@ var DB = {
 
     insert: function (obj, callback) {
         var key_name = this.name + "_" + this.pk;
-        client.hmset(key_name, obj);
+        var finished = this.list.length + 1;
+        var cb = function(err, reply) {
+            finished--;
+            if (finished <= 0) {
+                callback(err, reply);
+            }
+        };
+        client.hmset(key_name, obj, cb);
         for (var x in this.list) {
-            client.sadd(this.name + '_' + this.list[x] + '_' + obj[this.list[x]], key_name);
+            client.sadd(this.name + '_' + this.list[x] + '_' + obj[this.list[x]], key_name, cb);
         }
         this.pk++;
-        if (callback) {
-            callback();
-        }
     },
 
     update: function (condition, update, callback) {
