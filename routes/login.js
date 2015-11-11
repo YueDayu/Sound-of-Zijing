@@ -16,7 +16,7 @@ router.get("/", function(req, res, next)
         res.render("login", {});
 });
 
-router.post("/", function(req, res)
+router.post("/", function(req, res) 
 {
     var resData={};
     db[ADMIN_DB].find({username: req.body.username}, function(err,docs)

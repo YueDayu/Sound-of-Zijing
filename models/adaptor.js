@@ -22,7 +22,7 @@ var DB = {
     },
 
     find: function () {
-
+        
     },
 
     insert: function () {
