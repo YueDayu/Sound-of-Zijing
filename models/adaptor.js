@@ -22,8 +22,76 @@ var DB = {
         return this;
     },
 
-    find: function () {
-        
+    find: function (obj, callback) {
+        var union = function(obj, callback) {
+            var iserror = false;
+            var finished = obj.length();
+            var docs = [];
+            for (x in obj) {
+                this.find(obj[x], function(err, res) {
+                    if (err) {
+                        if (!iserror) {
+                            iserror = true;
+                            callback(err, []);
+                        }
+                    } else if (!iserror) {
+                        finished -= 1;
+                        docs.append(res);
+                        if (finished === 0) {
+                            callback(null, docs);
+                        }
+                    }
+                });
+            }
+        };
+
+        if (id in obj) {
+            client.hgetall(this.name + "_" + id, function(err, res) {
+                if (err) {
+                    callback(err, []);
+                } else {
+                    callback(null, [res]);
+                }
+            });
+        } else {
+            var cmd = "";
+            for (attr in obj) {
+                if (attr[0] != '$') {
+                    cmd  = cmd + " " + this.name + "_" + attr + "_" + obj[attr];
+                } else {
+                    if (attr === "$or") {
+                        //TODO
+                    }
+                }
+            }
+
+            client.sinter(cmd, function(err, res) {
+                if (err) {
+                    callback(err, []);
+                } else {
+                    var docs = [];
+                    var iserror = false;
+                    var finished = 0;
+                    for (x in res) finished += 1;
+                    for (x in res) {
+                        client.hgetall(res[x], function(err, res) {
+                            if (err) {
+                                if (!iserror) {
+                                    iserror = true;
+                                    callback(err, []);
+                                }
+                            } else if (!iserror) {
+                                docs.append(res);
+                                finished -= 1;
+                                if (finished === 0) {
+                                    callback(null, []);
+                                }
+                            }
+                        });
+                    }
+                }
+            });
+        }
     },
 
     insert: function () {
