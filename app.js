@@ -4,24 +4,17 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-var redis = require('redis');
+var session = require('express-session');
+
+var models = require('./models/models');
 
 var routes = require('./routes/index');
 var users = require('./routes/users');
-var database_config = require('./database_config.json');
-
-var client = redis.createClient(database_config.port, database_config.address);
-client.auth(database_config.password, function() {
-    console.log("auth success!");
-});
-
-client.on('error', function(error){
-    console.log(error);
-});
-
-client.get("name", function(err, data) {
-    console.log(data);
-});
+var ticketsinfo = require('./routes/ticketsinfo');
+var login = require('./routes/login');
+var actinfo = require('./routes/activity_info');
+var logout = require('./routes/logout');
+var acquireid = require('./routes/acquireid');
 
 var app = express();
 
@@ -35,10 +28,16 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(cookieParser());
+app.use(session({secret: 'Bingo Lingo!', saveUninitialized: false, resave: false}));
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', routes);
+app.use('/ticketsinfo', ticketsinfo);
+app.use('/actinfo', actinfo);
 app.use('/users', users);
+app.use('/login', login);
+app.use('/logout', logout);
+app.use('/acquireid', acquireid);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
@@ -71,5 +70,13 @@ app.use(function (err, req, res, next) {
     });
 });
 
-
 module.exports = app;
+
+models.createRedisClient();
+
+var server = app.listen(3000, function () {
+  var host = server.address().address;
+  var port = server.address().port;
+
+  console.log('Example app listening at http://%s:%s', host, port);
+});

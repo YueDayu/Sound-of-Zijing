@@ -34,3 +34,5 @@ npm-debug.log
 
 # database config file
 database_config.json
+redis.conf
+zjzs.rdb

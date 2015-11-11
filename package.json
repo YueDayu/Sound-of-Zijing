@@ -11,9 +11,12 @@
     "debug": "~2.2.0",
     "ejs": "~2.3.3",
     "express": "~4.13.1",
+    "express-session": "^1.12.1",
+    "moment": "^2.10.6",
     "morgan": "~1.6.1",
-    "serve-favicon": "~2.3.0",
+    "multer": "^1.1.0",
     "redis": "~2.3.0",
+    "serve-favicon": "~2.3.0",
     "wechat": "~2.0.2"
   }
 }
