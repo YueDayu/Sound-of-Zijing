@@ -21,14 +21,14 @@ router.post("/", function(req, res)
     var resData={};
     db[ADMIN_DB].find({username: req.body.username}, function(err,docs)
     {
-        docs = docs[0];
-        if (err)
+        if (err || docs.length === 0)
         {
             resData.message="failed";
             resData.error="none";
         }
         else
         {
+            docs = docs[0];
             if (docs.password===req.body.password)
             {
                 resData.message="success";

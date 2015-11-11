@@ -26,7 +26,7 @@ router.use("/", function(req, res, next)
 router.get("/", function(req, res)
 {
     console.log(3);
-    db[ADMIN_DB].find({user:req.session.user},function(err,docs)
+    db[ADMIN_DB].find({pk:req.session.user},function(err,docs)
     {
         if (err || docs.length==0)
         {
@@ -35,12 +35,12 @@ router.get("/", function(req, res)
             res.redirect("/login");
             return;
         }
-        if (true)
+        if (docs[0].manager==="1")
         {
             res.redirect("/users/manage");
             return;
         }
-        if (docs[0].cashier===true)
+        if (docs[0].cashier==="1")
         {
             res.redirect("/users/purchase");
             return;
@@ -53,7 +53,7 @@ router.get("/", function(req, res)
 });
 router.use("/manage", function(req, res, next)
 {
-    db[ADMIN_DB].find({user:req.session.user,manager:1},function(err,docs)
+    db[ADMIN_DB].find({pk:req.session.user,manager:1},function(err,docs)
     {
         if (err || docs.length==0)
         {
@@ -68,7 +68,7 @@ router.use("/manage", manageRoute);
 
 router.use("/purchase", function(req, res, next)
 {
-    db[ADMIN_DB].find({user:req.session.user,cashier:true},function(err,docs)
+    db[ADMIN_DB].find({pk:req.session.user,cashier:1},function(err,docs)
     {
         if (err || docs.length==0)
         {

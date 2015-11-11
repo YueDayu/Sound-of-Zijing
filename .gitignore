@@ -36,3 +36,7 @@ npm-debug.log
 database_config.json
 redis.conf
 zjzs.rdb
+
+address_configure.js
+
+public

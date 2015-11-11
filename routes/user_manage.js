@@ -228,6 +228,7 @@ router.get("/detail", function(req, res)
 	else
 	{
 		var idObj = getIDClass(req.query.actid);
+		console.log(idObj);
 		lock.acquire(ACTIVITY_DB, function(){
 			db[ACTIVITY_DB].find({_id:idObj},function(err,docs){
 				if (err || docs.length == 0)
@@ -282,12 +283,12 @@ router.get("/detail", function(req, res)
 						status: act.status,
 						id: req.query.actid
 					};
-				if (activity.need_seat == 0){
+				if (activity.need_seat == "0"){
 					res.render("activity_detail", {activity:activity});
 					lock.release(ACTIVITY_DB);
 					return;
 				}
-				else if (activity.need_seat == 1){
+				else if (activity.need_seat == "1"){
 					lock.acquire(SEAT_DB, function(){
 						db[SEAT_DB].find({activity:idObj},function(err,docs){
 							if (err || docs.length != 1)
@@ -307,7 +308,7 @@ router.get("/detail", function(req, res)
 						});
 					});
 				}
-				else if (activity.need_seat == 2){
+				else if (activity.need_seat == "2"){
 					lock.acquire(SEAT_DB, function(){
 						db[SEAT_DB].find({activity:idObj},function(err,docs){
 							if (err || docs.length != 1)

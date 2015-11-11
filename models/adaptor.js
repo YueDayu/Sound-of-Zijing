@@ -31,6 +31,8 @@ var DB = function () {
 
             if ("pk" in obj) {
                 callback(null, [obj["pk"]]);
+            } else if ("_id" in obj) {
+                callback(null, [obj["_id"]]);
             } else {
                 var cmd = [];
                 for (var attr in obj) {
@@ -59,6 +61,24 @@ var DB = function () {
                 };
             }
 
+            var checkCondition = function(obj, condition) {
+                for (attr in condition) {
+                    if (attr == "pk" || attr == "_id")
+                        continue;
+                    if (attr[0] == '$') {
+                        //TODO
+                        continue;
+                    }
+                    if (!(attr in obj)) {
+                        return false;
+                    }
+                    if (obj[attr] !== '' + condition[attr]) {
+                        return false;
+                    }
+                }
+                return true;
+            };
+
             this.__findPks__(obj, function (err, res) {
                 if (err) {
                     callback(err, []);
@@ -78,10 +98,12 @@ var DB = function () {
                                         callback(err, []);
                                     }
                                 } else if (!iserror) {
-                                    resobj.pk = res[x];
-                                    resobj._id = res[x];
-                                    docs.push(resobj);
                                     finished -= 1;
+                                    if (resobj && checkCondition(resobj, obj)) {
+                                        resobj.pk = res[x];
+                                        resobj._id = res[x];
+                                        docs.push(resobj);
+                                    }
                                     if (finished === 0) {
                                         callback(null, docs);
                                     }

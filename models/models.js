@@ -11,7 +11,7 @@ exports.admins = admins;
 exports.seats = seats;
 
 var table = [{name: tickets, key: ['stu_id', 'activity', 'unique_id']},
-        {name: activities, key: ['_id', 'status', 'key']},
+        {name: activities, key: ['status', 'key']},
         {name: students, key: ['weixin_id', 'status', 'stu_id']},
         {name: admins, key: ['username', 'user', 'manager', 'cashier']},
         {name: seats, key: ['activity']}];
