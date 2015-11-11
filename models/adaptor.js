@@ -22,19 +22,13 @@ var DB = {
         return this;
     },
 
-    find: function (obj, callback) {
+    __findPks__: function (obj, callback) {
         if (!callback) {
-            callback = function () {};
+            callback = function() {};
         }
 
         if ("pk" in obj) {
-            client.hgetall(this.name + "_" + obj["pk"], function(err, res) {
-                if (err) {
-                    callback(err, []);
-                } else {
-                    callback(null, [res]);
-                }
-            });
+            callback(null, [obj["pk"]]);
         } else {
             var cmd = [];
             for (var attr in obj) {
@@ -51,32 +45,47 @@ var DB = {
                 if (err) {
                     callback(err, []);
                 } else {
-                    if (res.length() === 0) {
-                        callback(null, []);
-                    }
+                    callback(null, res);
+                }
+            });
+        }
+    }
+
+    find: function (obj, callback) {
+        if (!callback) {
+            callback = function () {};
+        }
+
+        this.__findPks__(obj, function(err, res) {
+            if (err) {
+                callback(err, []);
+            } else {
+                if (res.length === 0) {
+                    callback(null, []);
+                } else {
                     var docs = [];
                     var iserror = false;
-                    var finished = 0;
-                    finished = res.length();
+                    var finished = res.length;
                     for (x in res) {
-                        client.hgetall(res[x], function(err, res) {
+                        client.hgetall(res[x], function(err, resobj) {
                             if (err) {
                                 if (!iserror) {
                                     iserror = true;
                                     callback(err, []);
                                 }
                             } else if (!iserror) {
-                                docs.append(res);
+                                resobj.pk = res[x];
+                                docs.push(resobj);
                                 finished -= 1;
                                 if (finished === 0) {
-                                    callback(null, []);
+                                    callback(null, docs);
                                 }
                             }
                         });
                     }
                 }
-            });
-        }
+            }
+        });
     },
 
     insert: function (obj, callback) {
@@ -91,8 +100,43 @@ var DB = {
         }
     },
 
-    update: function () {
+    update: function (condition, update, callback) {
+        if (!callback) {
+            callback = function() {};
+        }
 
+        this.__findPks__(condition, function(err, res){
+            if (err) {
+                callback(err, []);
+            } else {
+                if (res.length === 0) {
+                    callback(null, []);
+                } else {
+                    var finished = res.length;
+                    var iserror = false;
+                    var docs = [];
+                    for (var x in res) {
+                        client.hmset(res[x], update["$set"], function(err, reply) {
+                            if (err) {
+                                if (!iserror) {
+                                    iserror = true;
+                                    callback(err, []);
+                                }
+                            } else if (!iserror) {
+                                client.hgetall(res[x], function(err, resobj) {
+                                    finished -= 1;
+                                    resobj.pk = res[x];
+                                    docs.append(resobj);
+                                    if (finished === 0) {
+                                        callback(null, )
+                                    }
+                                });
+                            }
+                        });
+                    }
+                }
+            }
+        });
     }
 };
 
