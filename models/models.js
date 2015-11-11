@@ -2,7 +2,7 @@ var tickets = "ticket";
 var activities = "activity";
 var students = "student";
 var admins = "manager";
-var seats = "seat"
+var seats = "seat";
 
 var redis = require('redis');
 
@@ -13,6 +13,12 @@ exports.activities = activities;
 exports.students = students;
 exports.admins = admins;
 exports.seats = seats;
+
+var table = [{name: tickets, key: []},
+        {name: activities, key: []},
+        {name: students, key: []},
+        {name: admins, key: []},
+        {name: seats, key: []}];
 
 var client;
 
