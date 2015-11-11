@@ -110,36 +110,88 @@ var DB = {
             callback = function() {};
         }
 
-        this.__findPks__(condition, function(err, res){
-            if (err) {
-                callback(err, []);
-            } else {
-                if (res.length === 0) {
-                    callback(null, []);
-                } else {
-                    var finished = res.length;
-                    var iserror = false;
-                    var docs = [];
-                    for (var x in res) {
-                        client.hmset(res[x], update["$set"], function(err, reply) {
+        var updateRelations = function(pk, update, callback) {
+            if (!("$set" in update)) {
+                callback("no $set", []);
+                return;
+            }
+            client.hgetall(pk, function(err, resobj) {
+                if (err) {
+                    callback(err, []);
+                    return;
+                }
+                var finished = 0;
+                var iserror = false;
+                for (var attr in update["$set"]) finished += 1;
+                for (x in this.list) {
+                    if (iserror) {
+                        return;
+                    }
+                    var attr = this.list[x];
+                    if (!(attr in update["$set"])) {
+                        continue;
+                    }
+                    client.srem(this.name + "_" + attr + "_" + resobj[attr], resobj[attr], function(err, reply) {
+                        if (iserror) return;
+                        if (err) {
+                            if (!iserror) {
+                                iserror = true;
+                                callback(err, []);
+                            }
+                            return;
+                        }
+                        client.sadd(this.name + "_" + attr + "_" + update["$set"][attr], pk, function(err, reply) {
+                            if (iserror) return;
                             if (err) {
                                 if (!iserror) {
                                     iserror = true;
                                     callback(err, []);
                                 }
-                            } else if (!iserror) {
-                                client.hgetall(res[x], function(err, resobj) {
-                                    finished -= 1;
-                                    resobj.pk = res[x];
-                                    docs.append(resobj);
-                                    if (finished === 0) {
-                                        callback(null, )
-                                    }
-                                });
+                                return;
+                            }
+                            finished -= 1;
+                            if (finished === 0) {
+                                callback(null, [resobj]);
+                                return;
                             }
                         });
-                    }
+                    });
                 }
+            });
+        };
+
+        this.__findPks__(condition, function(err, res){
+            if (err) {
+                callback(err, []);
+                return;
+            }
+            if (res.length === 0) {
+                callback(null, []);
+                return;
+            }
+            var finished = res.length;
+            var iserror = false;
+            var docs = [];
+            for (var x in res) {
+                updateRelations(res[x], update, function(err, res) {
+                    client.hmset(res[x], update["$set"], function(err, reply) {
+                        if (err) {
+                            if (!iserror) {
+                                iserror = true;
+                                callback(err, []);
+                            }
+                            return;
+                        }
+                        client.hgetall(res[x], function(err, resobj) {
+                            finished -= 1;
+                            resobj.pk = res[x];
+                            docs.push(resobj);
+                            if (finished === 0) {
+                                callback(null, docs);
+                            }
+                        });
+                    });
+                });
             }
         });
     }
