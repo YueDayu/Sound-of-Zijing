@@ -66,7 +66,7 @@ function checkValidity(req, res, callback)
         res.send("ticketid is required!");
         return;
     }
-    db[TICKET_DB].find({unique_id: req.query.ticketid, status:{$ne:0}}, function(err, docs)
+    db[TICKET_DB].find({unique_id: req.query.ticketid}, function(err, docs)
     {
         if (docs.length == 0)
         {

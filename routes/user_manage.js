@@ -30,7 +30,7 @@ router.use("/checkin",checkin);
 
 router.get("/list", function(req, res) {
 	var activities1 = new Array();
-	db[ACTIVITY_DB].find({status:{$gte:0}}, function(err, docs){
+	db[ACTIVITY_DB].find({status:1}, function(err, docs){
 		if (err)
 		{
 			res.send("数据库抓取活动列表出错！请检查数据库。");
@@ -121,7 +121,7 @@ router.get("/export", function(req, res){
 		if (seatFlag != 0)
 			conf.cols.push({caption:'座位', type:'string'});
 
-		db[TICKET_DB].find({activity:idObj, status:{$ne:0}}, function(err, docs){
+		db[TICKET_DB].find({activity:idObj}, function(err, docs){
 			if (err)
 			{
 				res.send("票务数据库查找出错！");
@@ -404,7 +404,7 @@ router.post("/detail", function(req, res)
 	if (req.body.id == undefined) //新建活动
 	{
 		lock.acquire(ACTIVITY_DB, function(){
-			db[ACTIVITY_DB].find({key:activity["key"], $or:[{status:0},{status:1}]},function(err,docs){
+			db[ACTIVITY_DB].find({key:activity["key"]},function(err,docs){
 				var a, b, c, d, e;
 				var seatDBmap = {};
 				if (err || docs.length != 0)
@@ -542,7 +542,7 @@ router.post("/detail", function(req, res)
 					db[ACTIVITY_DB].insert(activity, function(){
 						if (activity["need_seat"] != 0)
 						{
-							db[ACTIVITY_DB].find({key:activity["key"], $or:[{status:0},{status:1}]},
+							db[ACTIVITY_DB].find({key:activity["key"]},
 							function(err,docs){
 								if (err || docs.length != 1)
 								{
@@ -610,7 +610,7 @@ router.post("/detail", function(req, res)
 	{
 		var idObj = getIDClass(req.body.id);
 		lock.acquire(ACTIVITY_DB, function(){
-			db[ACTIVITY_DB].find({_id:idObj, $or:[{status:0},{status:1}]},function(err,docs){
+			db[ACTIVITY_DB].find({_id:idObj},function(err,docs){
 				if (err || docs.length != 1)
 				{
 					res.send("404#修改活动失败，没有此ID对应的活动！");
@@ -743,7 +743,7 @@ router.post("/detail", function(req, res)
 						lock.release(ACTIVITY_DB);
 						return;
 					}
-					db[ACTIVITY_DB].find({key:activity["key"], $or:[{status:0},{status:1}], _id:{$ne:idObj}},
+					db[ACTIVITY_DB].find({key:activity["key"]},
 					function(err,docs){
 						if (err || docs.length != 0)
 						{

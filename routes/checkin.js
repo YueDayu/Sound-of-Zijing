@@ -132,7 +132,7 @@ router.post("/",function(req, res)
             {
                 stu_id:     uid,
                 activity:   id4Q,
-                status:     {$ne:0}
+                //status:     {$ne:0}
             },function(err, tik)
             {
                 if (err || tik.length==0)

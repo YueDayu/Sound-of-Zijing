@@ -15,55 +15,55 @@ router.get("/", function(req, res, next)
     res.render("cashier",{});
 });
 
-router.get("/listticket",function(req,res)
-{
-    if (req.query.stuid==null)
-    {
-        res.send("[]");
-        return;
-    }
-    db[TICKET_DB].find(
-    {
-        stu_id:     req.query.stuid,
-        $or:        [{status:2},{status:1,cost:{$ne:0}}]
-    },function(err,docs)
-    {
-        if (err || docs.length==0)
-        {
-            res.send("[]");
-            return;
-        }
-        var antiHash={};
-        var actList=[];
-        for (var i=0;i<docs.length;i++)
-        {
-            actList.push({_id:docs[i].activity});
-        }
-        db[ACTIVITY_DB].find({$or:actList},function(err, docs1)
-        {
-            if (err || docs1.length!=docs.length)
-            {
-                res.send("[]");
-                return;
-            }
-            for (var i=0;i<docs1.length;i++)
-            {
-                antiHash[docs1[i]._id.toString()]=docs1[i];
-            }
-            var single;
-            var ret=[];
-            for (var i=0;i<docs.length;i++)
-            {
-                single={};
-                single.ticketid=docs[i].unique_id;
-                single.actname=antiHash[docs[i].activity.toString()].name;
-
-                ret.push(single);
-            }
-            res.send(JSON.stringify(ret));
-        });
-    });
-});
+//router.get("/listticket",function(req,res)
+//{
+//    if (req.query.stuid==null)
+//    {
+//        res.send("[]");
+//        return;
+//    }
+//    db[TICKET_DB].find(
+//    {
+//        stu_id:     req.query.stuid,
+//        //$or:        [{status:2},{status:1,cost:{$ne:0}}]
+//    },function(err,docs)
+//    {
+//        if (err || docs.length==0)
+//        {
+//            res.send("[]");
+//            return;
+//        }
+//        var antiHash={};
+//        var actList=[];
+//        for (var i=0;i<docs.length;i++)
+//        {
+//            actList.push({_id:docs[i].activity});
+//        }
+//        db[ACTIVITY_DB].find({$or:actList},function(err, docs1)
+//        {
+//            if (err || docs1.length!=docs.length)
+//            {
+//                res.send("[]");
+//                return;
+//            }
+//            for (var i=0;i<docs1.length;i++)
+//            {
+//                antiHash[docs1[i]._id.toString()]=docs1[i];
+//            }
+//            var single;
+//            var ret=[];
+//            for (var i=0;i<docs.length;i++)
+//            {
+//                single={};
+//                single.ticketid=docs[i].unique_id;
+//                single.actname=antiHash[docs[i].activity.toString()].name;
+//
+//                ret.push(single);
+//            }
+//            res.send(JSON.stringify(ret));
+//        });
+//    });
+//});
 
 router.get("/getticket",function(req,res)
 {
@@ -75,7 +75,7 @@ router.get("/getticket",function(req,res)
     db[TICKET_DB].find(
     {
         unique_id:  req.query.tid,
-        $or:        [{status:2},{status:1,cost:{$ne:0}}]
+        //$or:        [{status:2},{status:1,cost:{$ne:0}}]
     },function(err, docs)
     {
         if (err || docs.length==0)
@@ -118,7 +118,7 @@ router.get("/buy",function(req,res)
         {
             unique_id:  req.query.tid,
             status:     1,
-            cost:       {$ne:0}
+            //cost:       {$ne:0}
         },function(err, docs)
         {
             if (err || docs.length==0)
