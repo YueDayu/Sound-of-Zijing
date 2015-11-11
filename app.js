@@ -6,13 +6,15 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var session = require('express-session');
 
-var models = require('./models/models');
-var weixin = require('./routes/weixin');
 var routes = require('./routes/index');
 var users = require('./routes/users');
+var weixin = require('./routes/weixin');
+var validate = require('./routes/validate');
 var ticketsinfo = require('./routes/ticketsinfo');
 var login = require('./routes/login');
 var actinfo = require('./routes/activity_info');
+var chooseat = require('./routes/choose_seat');
+var chooarea = require('./routes/choose_area');
 var logout = require('./routes/logout');
 var acquireid = require('./routes/acquireid');
 
@@ -35,8 +37,11 @@ app.use('/weixin', weixin);
 app.use('/', routes);
 app.use('/ticketsinfo', ticketsinfo);
 app.use('/actinfo', actinfo);
+app.use('/chooseseat', chooseat);
+app.use('/choosearea', chooarea);
 app.use('/users', users);
 app.use('/login', login);
+app.use('/validate', validate);
 app.use('/logout', logout);
 app.use('/acquireid', acquireid);
 

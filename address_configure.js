@@ -1,6 +1,6 @@
 
 
-var hostIP='127.0.0.1';
+var hostIP='59.66.136.69';
 
 exports.IP=hostIP;
 exports.validateAddress=    "http://"+hostIP+"/validate";
