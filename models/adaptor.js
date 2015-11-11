@@ -79,6 +79,7 @@ var DB = function () {
                                     }
                                 } else if (!iserror) {
                                     resobj.pk = res[x];
+                                    resobj._id = res[x];
                                     docs.push(resobj);
                                     finished -= 1;
                                     if (finished === 0) {
@@ -200,6 +201,7 @@ var DB = function () {
                             client.hgetall(res[x], function (err, resobj) {
                                 finished -= 1;
                                 resobj.pk = res[x];
+                                resobj._id = res[x];
                                 docs.push(resobj);
                                 if (finished === 0) {
                                     callback(null, docs);

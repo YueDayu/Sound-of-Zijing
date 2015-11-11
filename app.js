@@ -7,7 +7,7 @@ var bodyParser = require('body-parser');
 var session = require('express-session');
 
 var models = require('./models/models');
-
+var weixin = require('./routes/weixin');
 var routes = require('./routes/index');
 var users = require('./routes/users');
 var ticketsinfo = require('./routes/ticketsinfo');
@@ -31,6 +31,7 @@ app.use(cookieParser());
 app.use(session({secret: 'Bingo Lingo!', saveUninitialized: false, resave: false}));
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.use('/weixin', weixin);
 app.use('/', routes);
 app.use('/ticketsinfo', ticketsinfo);
 app.use('/actinfo', actinfo);
