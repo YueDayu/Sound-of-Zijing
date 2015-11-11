@@ -16,9 +16,10 @@ client.on('error', function (error) {
 
 var DB = {
     createNew: function (obj) {
-        DB.name = obj.name;
-        DB.list = obj.key;
-        DB.pk = 0;
+        this.name = obj.name;
+        this.list = obj.key;
+        this.pk = 0;
+        return this;
     },
 
     find: function () {
@@ -26,7 +27,7 @@ var DB = {
     },
 
     insert: function () {
-
+        var key_name = this.name + "_" + str(this.pk);
     },
 
     update: function () {
