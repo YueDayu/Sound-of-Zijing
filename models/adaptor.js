@@ -94,8 +94,16 @@ var DB = {
         }
     },
 
-    insert: function () {
-        var key_name = this.name + "_" + str(this.pk);
+    insert: function (obj, callback) {
+        var key_name = this.name + "_" + this.pk;
+        client.hmset(key_name, obj);
+        for (var x in this.list) {
+            client.sadd(this.name + '_' + this.list[x] + '_' + obj[this.list[x]], key_name);
+        }
+        this.pk++;
+        if (callback) {
+            callback();
+        }
     },
 
     update: function () {
