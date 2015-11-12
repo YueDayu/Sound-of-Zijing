@@ -30,7 +30,7 @@ router.use("/checkin",checkin);
 
 router.get("/list", function(req, res) {
 	var activities1 = new Array();
-	db[ACTIVITY_DB].find({status:1}, function(err, docs){
+	db[ACTIVITY_DB].find({}, function(err, docs){
 		if (err)
 		{
 			res.send("数据库抓取活动列表出错！请检查数据库。");
@@ -264,7 +264,7 @@ router.get("/detail", function(req, res)
 							minute: moment(et).get("minute")
 						},
 						total_tickets: act.remain_tickets,
-						pic_url: act.pic_url,
+						pic_url: act.pic_url.replace("\\", "/"),
 						book_start: {
 							year: moment(bs).get("year"),
 							month: (moment(bs).get("month")+1),
@@ -618,7 +618,7 @@ router.post("/detail", function(req, res)
 					lock.release(ACTIVITY_DB);
 					return;
 				}
-				if (docs[0].status == 0) //修改暂存的活动
+				if (docs[0].status == "0") //修改暂存的活动
 				{
 					var a, b, c, d, e;
 					var seatDBmap = {};
@@ -757,7 +757,7 @@ router.post("/detail", function(req, res)
 							if (activity["description"])
 								activity["description"] = activity["description"].replace(/\r?\n/g, "\\n");
 							db[ACTIVITY_DB].update({_id:idObj},{$set: activity},{multi:false},function(err,result){
-								if (err || result.n != 1)
+								if (err || result.length != 1)
 								{
 									res.send("404#修改活动失败，没有此ID对应的活动！");
 									lock.release(ACTIVITY_DB);
@@ -800,7 +800,7 @@ router.post("/detail", function(req, res)
 										}
 									});
 								}
-								else if (activity["need_seat"] == 2)
+								else if (activity["need_seat"] == "2")
 								{
 									seatDBmap["activity"] = idObj;
 									db[SEAT_DB].update({activity:idObj},seatDBmap,{multi:false},
@@ -823,7 +823,7 @@ router.post("/detail", function(req, res)
 										}
 										else
 										{
-											if (activity.status == 1)
+											if (activity.status == "1")
 											{
 												if (urls.autoRefresh)
 												{

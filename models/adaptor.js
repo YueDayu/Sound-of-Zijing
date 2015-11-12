@@ -28,8 +28,17 @@ var DB = function () {
                 callback = function () {
                 };
             }
-
-            if ("pk" in obj) {
+            if (Object.keys(obj).length === 0) {
+                client.smembers(this.name + "__all", function(err, reply){
+                    if (err) {
+                        callback(err, []);
+                    } else {
+                        callback(null, reply);
+                    }
+                });
+                return;
+            }
+            else if ("pk" in obj) {
                 callback(null, [obj["pk"]]);
             } else if ("_id" in obj) {
                 callback(null, [obj["_id"]]);
@@ -57,8 +66,7 @@ var DB = function () {
 
         find: function (obj, callback) {
             if (!callback) {
-                callback = function () {
-                };
+                callback = function () {};
             }
 
             var checkCondition = function(obj, condition) {
@@ -118,7 +126,7 @@ var DB = function () {
         insert: function (obj, callback) {
             var key_name = this.name + "_" + this.pk;
             console.log(key_name);
-            var finished = this.list.length + 1;
+            var finished = this.list.length + 2;
             var cb = function (err, reply) {
                 finished--;
                 if (finished <= 0) {
@@ -126,13 +134,14 @@ var DB = function () {
                 }
             };
             client.hmset(key_name, obj, cb);
+            client.sadd(this.name + '__all', key_name, cb);
             for (var x in this.list) {
                 client.sadd(this.name + '_' + this.list[x] + '_' + obj[this.list[x]], key_name, cb);
             }
             this.pk++;
         },
 
-        update: function (condition, update, callback) {
+        update: function (condition, update, ismulti, callback) {
             if (!callback) {
                 callback = function () {
                 };
@@ -226,6 +235,7 @@ var DB = function () {
                                 resobj._id = res[x];
                                 docs.push(resobj);
                                 if (finished === 0) {
+                                    docs.n = docs.length;
                                     callback(null, docs);
                                 }
                             });

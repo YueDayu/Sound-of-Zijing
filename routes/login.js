@@ -34,6 +34,7 @@ router.post("/", function(req, res)
                 resData.message="success";
                 resData.next=urls.userPage;
                 req.session.user=docs.pk;
+                console.log(req.session.user);
             }
             else
             {
