@@ -32,8 +32,6 @@ npm-debug.log
 # webstorm base folder
 .idea/
 
-public/
-
 database_config.json
 redis.conf
 zjzs.rdb
