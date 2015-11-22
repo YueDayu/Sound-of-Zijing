@@ -38,4 +38,5 @@ database_config.json
 redis.conf
 zjzs.rdb
 address_configure.js
+weixin_configure.js
 db
