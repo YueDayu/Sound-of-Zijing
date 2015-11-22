@@ -1,3 +1,4 @@
+
 {
   "name": "zjzs",
   "version": "0.0.0",
@@ -11,9 +12,17 @@
     "debug": "~2.2.0",
     "ejs": "~2.3.3",
     "express": "~4.13.1",
+    "express-session": "^1.12.1",
+    "moment": "^2.10.6",
     "morgan": "~1.6.1",
-    "serve-favicon": "~2.3.0",
+    "multer": "~0.1.6",
     "redis": "~2.3.0",
-    "wechat": "~2.0.2"
+    "mongojs": "~0.17.0",
+    "serve-favicon": "~2.3.0",
+    "wechat": "~2.0.2",
+    "xml2js": "~0.4.4",
+    "thunky": "~0.1.0",
+    "request": "2.48.0",
+    "excel-export": "~0.4.1"
   }
 }
