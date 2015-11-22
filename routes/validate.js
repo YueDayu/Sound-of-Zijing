@@ -26,14 +26,15 @@ router.get('/', function(req, res) {
 });
 
 router.get('/time', function(req, res) {
-    request('http://' + models.authIP + ':' + models.authPort + models.authPrefix + '/time', //
-    function(error, response, body){
-        if (!error && response.statusCode == 200) {
+    //request('http://' + models.authIP + ':' + models.authPort + models.authPrefix + '/time', //
+    //function(error, response, body){
+    //    if (!error && response.statusCode == 200) {
+    body = '200';
             res.send(body);
-        }
-        else
-            res.send('');
-    });
+        //}
+        //else
+        //    res.send('');
+    //});
 });
 
 router.post('/', function(req, res) {
@@ -48,62 +49,117 @@ router.post('/', function(req, res) {
             'Content-Type' : 'application/x-www-form-urlencoded'
         }
     };
-    var r = http.request(post_option, function(resp) {
-        resp.setEncoding('utf8');
-        resp.on('data', function(chunk){
-            //console.log(chunk);
-            var stu = JSON.parse(chunk);
-            if (stu.code == 0){
-                lock.acquire(students, function(){
-                    db[students].find({weixin_id: openid, status: 1}, function(err, docs) {
+    //var stu = JSON.parse(chunk);
+    var stu = {
+      'code': 0,
+      'data':{
+          'ID':'2013013293'
+      }
+    };
+    if (stu.code == 0){
+        lock.acquire(students, function(){
+            db[students].find({weixin_id: openid, status: 1}, function(err, docs) {
+                if (docs.length == 0){
+                    db[students].find({stu_id:stu.data.ID}, function(err, docs) {
                         if (docs.length == 0){
-                            db[students].find({stu_id:stu.data.ID}, function(err, docs) {
-                                if (docs.length == 0){
-                                    db[students].insert({stu_id: stu.data.ID, weixin_id: openid, status: 1}, function(){
-                                        lock.release(students);
-                                        res.send('Accepted');
-                                        return;
-                                    });
-                                }
-                                else{
-                                    db[students].update({stu_id: stu.data.ID},  {$set : {status: 1, weixin_id: openid}}, function() {
-                                        lock.release(students);
-                                        res.send('Accepted');
-                                        return;
-                                    });
-                                }
+                            db[students].insert({stu_id: stu.data.ID, weixin_id: openid, status: 1}, function(){
+                                lock.release(students);
+                                res.send('Accepted');
+                                return;
                             });
                         }
                         else{
-                            var flag = false;
-                            var i;
-                            for (i = 0; i < docs.length; i++) {
-                                if (docs[i].stu_id == stu.data.ID){
-                                    flag = true;
-                                    break;
-                                }
-                            }
-                            if (flag){
-                                    lock.release(students);
-                                    res.send('Accepted');
-                                    return;
-                            }
-                            else{
+                            db[students].update({stu_id: stu.data.ID},  {$set : {status: 1, weixin_id: openid}}, function() {
                                 lock.release(students);
-                                res.send('Binded');
+                                res.send('Accepted');
                                 return;
-                            }
+                            });
                         }
                     });
-                });
-            }
-            else {
-                res.send(stu.message);
-                return;
-            }
+                }
+                else{
+                    var flag = false;
+                    var i;
+                    for (i = 0; i < docs.length; i++) {
+                        if (docs[i].stu_id == stu.data.ID){
+                            flag = true;
+                            break;
+                        }
+                    }
+                    if (flag){
+                        lock.release(students);
+                        res.send('Accepted');
+                        return;
+                    }
+                    else{
+                        lock.release(students);
+                        res.send('Binded');
+                        return;
+                    }
+                }
+            });
         });
-        resp.on('end', function(){});
-    });
+    }
+    else {
+        res.send(stu.message);
+        return;
+    }
+    //var r = http.request(post_option, function(resp) {
+    //    resp.setEncoding('utf8');
+    //    resp.on('data', function(chunk){
+            //console.log(chunk);
+            //var stu = JSON.parse(chunk);
+            //if (stu.code == 0){
+            //    lock.acquire(students, function(){
+            //        db[students].find({weixin_id: openid, status: 1}, function(err, docs) {
+            //            if (docs.length == 0){
+            //                db[students].find({stu_id:stu.data.ID}, function(err, docs) {
+            //                    if (docs.length == 0){
+            //                        db[students].insert({stu_id: stu.data.ID, weixin_id: openid, status: 1}, function(){
+            //                            lock.release(students);
+            //                            res.send('Accepted');
+            //                            return;
+            //                        });
+            //                    }
+            //                    else{
+            //                        db[students].update({stu_id: stu.data.ID},  {$set : {status: 1, weixin_id: openid}}, function() {
+            //                            lock.release(students);
+            //                            res.send('Accepted');
+            //                            return;
+            //                        });
+            //                    }
+            //                });
+            //            }
+            //            else{
+            //                var flag = false;
+            //                var i;
+            //                for (i = 0; i < docs.length; i++) {
+            //                    if (docs[i].stu_id == stu.data.ID){
+            //                        flag = true;
+            //                        break;
+            //                    }
+            //                }
+            //                if (flag){
+            //                        lock.release(students);
+            //                        res.send('Accepted');
+            //                        return;
+            //                }
+            //                else{
+            //                    lock.release(students);
+            //                    res.send('Binded');
+            //                    return;
+            //                }
+            //            }
+            //        });
+            //    });
+            //}
+            //else {
+            //    res.send(stu.message);
+            //    return;
+            //}
+        //});
+        //resp.on('end', function(){});
+    //});
     post_data = querystring.stringify({'secret':  tmp });
     r.write(post_data);
     r.end();
