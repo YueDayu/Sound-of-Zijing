@@ -38,3 +38,6 @@ zjzs.rdb
 address_configure.js
 weixin_configure.js
 db
+
+# upload image.
+public/uploadpics/
