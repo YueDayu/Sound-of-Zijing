@@ -11,6 +11,7 @@ var USER_DB = model.students;
 var ACTIVITY_DB = model.activities;
 var SEAT_DB = model.seats;
 var db = model.db;
+var redis_db = model.redis_db;
 
 var alphabet = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM0123456789";
 
@@ -24,12 +25,12 @@ exports.clearCache = function () {
 };
 
 function verifyStudent(openID, ifFail, ifSucc) {
-    db[USER_DB].find({weixin_id: openID, status: 1}, function (err, docs) {
-        if (err || docs.length == 0) {
+    redis_db.get(USER_DB + '_' + openID, function(err, res) {
+        if (err || !res) {
             ifFail();
             return;
         }
-        ifSucc(docs[0].stu_id);
+        ifSucc(res);
     });
 }
 exports.verifyStu = verifyStudent;

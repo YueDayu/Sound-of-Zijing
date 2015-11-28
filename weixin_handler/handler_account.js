@@ -12,6 +12,7 @@ var TICKET_DB = model.tickets;
 var USER_DB = model.students;
 var ACTIVITY_DB = model.activities;
 var db = model.db;
+var redis_db = model.redis_db;
 
 exports.check_bind_accout = function (msg) {
     if (msg.MsgType[0] === "text") {
@@ -48,13 +49,10 @@ exports.faire_unbind_accout = function (msg, res) {
         res.send(template.getPlainTextTemplate(msg, "该账号尚未绑定。"));
     }, function () {
         lock.acquire(USER_DB, function () {
-            db[USER_DB].update({weixin_id: openID, status: 1},
-                {
-                    $set: {status: 0}
-                }, {multi: false}, function () {
-                    lock.release(USER_DB);
-                    res.send(template.getPlainTextTemplate(msg, "绑定已经解除。"));
-                });
+            redis_db.del(USER_DB + '_' + openID, function() {
+                lock.release(USER_DB);
+                res.send(template.getPlainTextTemplate(msg, "绑定已经解除。"));
+            });
         });
     });
 };
@@ -123,13 +121,10 @@ exports.faire_apply_exp = function (msg, res) {
     var openID = msg.FromUserName[0];
     handler_ticket.verifyStu(openID, function () {
         lock.acquire(USER_DB, function () {
-            db[USER_DB].update({stu_id: "2333333333", status: 1},
-                {
-                    $set: {weixin_id: openID}
-                }, {upsert: true}, function () {
-                    lock.release(USER_DB);
-                    res.send(template.getPlainTextTemplate(msg, "获取实验账号成功"));
-                });
+            redis_db.set(USER_DB + '_' + openID, '2333333333', function() {
+                lock.release(USER_DB);
+                res.send(template.getPlainTextTemplate(msg, "获取实验账号成功"));
+            });
         });
     }, function () {
         res.send(template.getPlainTextTemplate(msg, "该账号已经绑定。"));
