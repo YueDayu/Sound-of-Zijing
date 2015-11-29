@@ -15,7 +15,7 @@ router.post('/', function (req, res) {
     if (thefile instanceof Array)
         thefile = thefile[0];
 
-    res.send("http://" + urls.IP + thefile.path.substr(6));
+    res.send("http://" + urls.IP + thefile.path.substr(6).replace(/\\/g, '/'));
 });
 
 module.exports = router;
