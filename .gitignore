@@ -37,3 +37,5 @@ public/uploadpics/
 
 # server config
 config.json
+
+db/
