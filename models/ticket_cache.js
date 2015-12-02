@@ -21,8 +21,8 @@ later.date.localTime();
 
 /*
  Add activity when pre-load. use 'activity key' to search status and activity_id
- -2: per-loading
- -1: per-load finished: read data from the cache.
+ -2: pre-loading
+ -1: pre-load finished: read data from the cache.
  0: book begin
  1: book end but can choose area
  2: all opt end and save back
@@ -56,16 +56,16 @@ var activity_cache = function (activity_key, book_start, book_end) {
     this.user_map = {}; // {num: ticket_number, tickets: {ticket_info}}
     this.activity_info = {};
     this.seat_map = {};
-    this.per_load_timer = null;
+    this.pre_load_timer = null;
     this.book_start_timer = null;
     this.book_end_timer = null;
     this.save_back_timer = null;
     this.save_file_timer = null;
 
     this.clear_timer = function () {
-        if (this.per_load_timer != null) {
-            this.per_load_timer.clear();
-            this.per_load_timer = null;
+        if (this.pre_load_timer != null) {
+            this.pre_load_timer.clear();
+            this.pre_load_timer = null;
         }
         if (this.book_start_timer != null) {
             this.book_start_timer.clear();
@@ -95,8 +95,8 @@ var activity_cache = function (activity_key, book_start, book_end) {
     // just set timer!
     this.set_time = function (book_start, book_end) {
         this.clear_timer();
-        this.per_load_timer = later.setTimeout(function () {
-            this.per_load();
+        this.pre_load_timer = later.setTimeout(function () {
+            this.pre_load();
         }.bind(this), this.get_sched(moment(parseInt(book_start)).subtract(5, 'm')), this);
 
         this.book_start_timer = later.setTimeout(function () {
@@ -111,7 +111,7 @@ var activity_cache = function (activity_key, book_start, book_end) {
             this.save_to_db();
         }.bind(this), this.get_sched(moment(parseInt(book_end)).add(1, 'h')), this);
     };
-    this.per_load = function () {
+    this.pre_load = function () {
         if (current_activity[this.activity_key] != null) {
             console.log("the activity is exist! please check the data.");
             return;
@@ -134,21 +134,21 @@ var activity_cache = function (activity_key, book_start, book_end) {
                     this.activity_info = docs[0];
                     this.all_ticket_num = this.activity_info.remain_tickets;
                     current_activity[this.activity_key].activity_id = this.activity_info._id;
-                    console.log('per-load success. ');
+                    console.log('pre-load success. ');
                     if (this.activity_info.need_seat != 0) { // load seat information
                         db[SEAT_DB].find({activity: this.activity_info._id}, function (err, doc2) {
                             if (err || doc2.length == 0) {
-                                console.log('can\'t per-load seat information. key: ' + this.activity_key);
+                                console.log('can\'t pre-load seat information. key: ' + this.activity_key);
                                 return;
                             }
                             this.seat_map = doc2[0];
                             // finished
-                            console.log('per-load is finished! key: ' + this.activity_key);
+                            console.log('pre-load is finished! key: ' + this.activity_key);
                             current_activity[this.activity_key].status = -1;
                             lock.release('cache' + this.activity_key);
                         }.bind(this));
                     } else { // finished
-                        console.log('per-load is finished! key: ' + this.activity_key);
+                        console.log('pre-load is finished! key: ' + this.activity_key);
                         current_activity[this.activity_key].status = -1;
                         lock.release('cache' + this.activity_key);
                     }
