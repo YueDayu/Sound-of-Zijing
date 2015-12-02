@@ -7,7 +7,7 @@
     <meta content="telephone=no" name="format-detection">
     <meta name="viewport" content="width=device-width, maximum-scale=1, initial-scale=1, user-scalable=no">
     <title></title>
-    
+
     <link rel="stylesheet" href="css/style.min.css">
     <link type="text/css" href="css/style_zbw.css" rel="stylesheet">
     <script type="text/javascript">
@@ -15,7 +15,7 @@
             return true;
         }
     </script>
-    
+
 </head>
 
 <body>
@@ -70,7 +70,7 @@
     var activity_end_time_raw=12312312321;
     var activity_book_ticket_end_time_raw=(new Date()).getTime()+96400000;
     var time_server=new Date();//服务器当前时间
-    
+
     var activity_page_title="新年音乐会-活动详情";//页面标题名称
     var activity_title="新年音乐会";//活动名称
     var activity_seat_type=1;//0:不选座 1:选区 2:选座
@@ -83,6 +83,7 @@
     var activity_remain_ticket = 123621;
     var activity_place = "新清华学堂";
     var act_key= "2345678900123844510394871032985";
+    var activity_max_tickets = 3;
 **/
 /********需要从后台动态添加的信息**********/
     var activity_time_raw=<%= act_start %>;//活动时间(毫秒)
@@ -103,6 +104,7 @@
     var activity_remain_ticket = <%= rem_tik %>;
     var activity_place = "<%= act_place %>";
     var act_key= "<%= act_key %>";
+    var activity_max_tickets = <%= max_tickets %>;
 /**/
 
 </script>
