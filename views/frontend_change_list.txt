@@ -1,0 +1,27 @@
+checkTicket.ejs（改动最多）
+  --增加多张票的显示
+  --票面信息的保护
+
+seat.ejs
+  --增加每个分区的座位数量控件（关键是控件的接口要做好）
+
+seat_simple.ejs
+  --同上
+
+actinfo.ejs
+  --显示多张票的张数限制
+
+activity_checkin.ejs
+  --暂时不用改
+
+seat_litang.ejs
+  --把那个占了几百行代码的座位改了吧（也许能改也许来不及）
+
+activity_detail_user.ejs
+  --选票张数限制要加上
+
+activity_detail.ejs
+  --增加可以设置选票张数上限的控件
+
+activity_list.ejs
+  --好像没什么要改的
