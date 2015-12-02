@@ -39,3 +39,5 @@ public/uploadpics/
 config.json
 
 db/
+
+redis.conf
