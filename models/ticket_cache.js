@@ -10,12 +10,15 @@
 
 var later = require('later');
 var moment = require('moment');
+var fs = require('fs');
 var model = require('../models/models');
 var lock = require('../models/lock');
 var db = model.db;
 var ACTIVITY_DB = model.activities;
 var SEAT_DB = model.seats;
 var TICKET_DB = model.tickets;
+
+var snapshot_path = "../snapshot/"
 
 later.date.localTime();
 
@@ -50,7 +53,7 @@ var load_not_end_activity = function () {
     db[ACTIVITY_DB].find(
         {
             status: 1,
-            book_end: {$lt: current_time}
+            book_end: {$gt: current_time}
         }, function(err, docs){
             if (err || docs.length == 0) {
                 console.log("pre-load failed or no activity");
@@ -59,6 +62,7 @@ var load_not_end_activity = function () {
             for (idx in docs) {
                 var doc = docs[idx];
                 all_activity[doc.key] = new activity_cache(doc.key, doc.book_start, doc.book_end);
+                all_activity[doc.key].restore_from_file();
             }
         });
 };
@@ -179,10 +183,46 @@ var activity_cache = function (activity_key, book_start, book_end) {
         }.bind(this));
     };
     this.save_to_file = function () {
-
+        lock.acquire('cache' + this.activity_key, function() {
+            if (current_activity[this.activity_key].status >= -1) {
+                var data = JSON.stringify(
+                    {'remain_tickets': this.activity_info.remain_tickets,
+                     'user_map': this.user_map,
+                     'seat_map': this.seat_map,
+                     'timestamp': moment().valueOf();
+                    });
+                var filepath = snapshot_path + this.activity_key + '.tmp';
+                fs.writeFile(filepath, data, function(err) {
+                    if (err) {
+                        //TODO handle bad saved files
+                        console.log('Error saving snapshot. key=' + this.activity_key)
+                    }
+                    lock.release('cache' + this.activity_key);
+                });
+            } else {
+                lock.release('cache' + this.activity_key);
+            }
+        }).bind(this);
     };
     this.restore_from_file = function () {
-
+        lock.acquire('cache' + this.activity_key, function() {
+            if (current_activity[this.activity_key].status >= -1) {
+                var filepath = snapshot_path + this.activity_key + '.tmp';
+                fs.readFile(filepath, function(err, rawdata) {
+                    if (err) {
+                        console.log('Snapshot file read failed. key=' + this.activity_key);
+                    } else {
+                        data = JSON.parse(rawdata);
+                        this.activity_info.remain_tickets = data['remain_tickets'];
+                        this.user_map = data['user_map'];
+                        this.seat_map = data['seat_map'];
+                    }
+                    lock.release('cache' + this.activity_key);
+                });
+            } else {
+                lock.release('cache' + this.activity_key);
+            }
+        }).bind(this);
     };
     // TODO: disable the time which saved files.
     this.book_end_event = function () {
