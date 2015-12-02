@@ -52,9 +52,6 @@ exports.load_not_end_activity = load_not_end_activity;
 
 var activity_cache = function (activity_key, book_start, book_end) {
     this.activity_key = activity_key;
-    //this.book_start = book_start;
-    //this.book_end = book_end;
-    //this.ticket_map = []; // whole ticket information.
     this.all_ticket_num = 0;
     this.user_map = {}; // {num: ticket_number, tickets: {ticket_info}}
     this.activity_info = {};
@@ -194,6 +191,21 @@ var activity_cache = function (activity_key, book_start, book_end) {
                 return;
             }
             var save_item_num = this.all_ticket_num - this.activity_info.remain_tickets + 1;
+            if (this.activity_info.need_seat() != 0) { // save sear data.
+                save_item_num++;
+                db[SEAT_DB].update({
+                    activity: this.activity_info._id
+                }, this.seat_map, {multi: false}, function() {
+                    save_item_num--;
+                    if (save_item_num == 0) { // finished all
+                        var id = this.activity_info._id;
+                        current_activity[this.activity_key] = null;
+                        this.clear_activity();
+                        all_activity[id] = null;
+                        lock.release('cache' + this.activity_key);
+                    }
+                }.bind(this));
+            }
             db[ACTIVITY_DB].update({
                 _id: this.activity_info._id
             }, this.activity_info, {multi: false}, function (err, result) {
@@ -228,7 +240,6 @@ var activity_cache = function (activity_key, book_start, book_end) {
         }.bind(this));
     };
     this.clear_activity = function () {
-        //this.ticket_map = {};
         this.user_map = {};
         this.activity_info = {};
         this.seat_map = {};
