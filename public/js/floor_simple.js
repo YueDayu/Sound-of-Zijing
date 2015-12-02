@@ -1,13 +1,27 @@
-﻿$(document).ready(function() {
+﻿
+var ticketLeft = new Object();
+ticketLeft.A = 1;
+ticketLeft.B = 0;
+ticketLeft.C = 3;
+ticketLeft.D = 5;
+ticketLeft.E = 7;
+var stateCode = 0;
+var maxtickets = 3;
+var all_selected_tickets_count = 0;
+
+$(document).ready(function() {
 	//渲染界面数据和图片
 	$('#book_time').html(book_time);
-	
+
+
 	//显示票数
 	$("#block_A a").html("A区(" + ticketLeft.A + ")");
 	$("#block_B a").html("B区(" + ticketLeft.B + ")");
 	$("#block_C a").html("C区(" + ticketLeft.C + ")");
 	$("#block_D a").html("D区(" + ticketLeft.D + ")");
 	$("#block_E a").html("E区(" + ticketLeft.E + ")");
+
+
 
 	//区域票数
 	ticketNum = new Array();
@@ -32,41 +46,57 @@
 				break;
 		case 2: alertInfo("选座超时<br>请重新选座");
 				break;
-		default: alertInfo("未连入wifi,网页已切入极速版<br>请点击图示区域进行选座");
+		default: alertInfo("未连入wifi,网页已切入极速版");
 				break;
 	}
 	//渲染结束
 });
 
 
-var selected = 0;//记录当前用户选择的区域
+$("#choose").find("a").click(function() {
+	var selected_tickets_count = $(this).parent().val();
+	var selected_area = $(this).parent().attr('id').substring(0,1);
+	var ticket_left;
+	switch(selected_area){
+		case "A":
+			ticket_left = ticketLeft.A;
+			break;
+		case "B":
+			ticket_left = ticketLeft.B;
+			break;
+		case "C":
+			ticket_left = ticketLeft.C;
+			break;
+		case "D":
+			ticket_left = ticketLeft.D;
+			break;
+		case "E":
+			ticket_left = ticketLeft.E;
+			break;
+	}
 
-//区域的点击事件
-$("[id^=block]").click(function(){
-	if ($(this).children("a").html()[3] == "0"){
-		alertInfo("所选区域已满<br>请选择其他区域");
-		return;
+	if(($(this).attr('id')).substring(0,4) == "plus"){
+		if(maxtickets == all_selected_tickets_count) {
+			alertInfo("您已经选完座位了");
+			return;
+		}
+		if((ticket_left > selected_tickets_count)) {
+			selected_tickets_count = selected_tickets_count + 1;
+			all_selected_tickets_count = all_selected_tickets_count + 1;
+		}
+		else
+			alertInfo("所选区域已满<br>请选择其他区域");
+		$(this).parent().val(selected_tickets_count);
+		$(this).next().val(selected_tickets_count);
 	}
-	if (selected != 0){
-		$('#' + selected + " [id^=area]").css("background", "#6fd9d9");
+	else{
+		if(selected_tickets_count > 0)
+			selected_tickets_count = selected_tickets_count - 1;
+		if(all_selected_tickets_count > 0)all_selected_tickets_count = all_selected_tickets_count - 1;
+		$(this).parent().val(selected_tickets_count);
+		$(this).prev().val(selected_tickets_count);
 	}
-	selected = $(this).attr("id");
-	$(this).children("[id^=area]").css("background", "#f0ee2d");
-
-	//更新文字信息
-	$("#seat_info").html(selected[6]+"区");
-	var avaiNumber;
-	switch(selected[6]){
-		case 'A': avaiNumber = ticketLeft.A; break;
-		case 'B': avaiNumber = ticketLeft.B; break;
-		case 'C': avaiNumber = ticketLeft.C; break;
-		case 'D': avaiNumber = ticketLeft.D; break;
-		case 'E': avaiNumber = ticketLeft.E; break;
-	}
-	$("#avaiNumber").html(avaiNumber);
 })
-
-
 
 //提交按钮的点击事件
 $("#buttom_frame").click(function(){

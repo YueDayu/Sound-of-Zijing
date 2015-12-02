@@ -87,6 +87,8 @@ c.css("top", topTemp);
 
 
 //文字区域样式
-$("#info_Area").css("font-size", 0.03*document.body.clientWidth);
+$('#info_Area').css("font-size", 0.04*document.body.clientWidth);
+$('#choose_Area').css("font-size", 0.04*document.body.clientWidth);
+$('input').css("font-size", 0.04*document.body.clientWidth);
 
 /****CSS格式调整结束*****/
