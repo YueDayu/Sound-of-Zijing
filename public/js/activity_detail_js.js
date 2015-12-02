@@ -89,7 +89,8 @@ var dateInterfaceMap = {
     'area_arrange': 'arrange_area',
     'uploadPic': 'button',
     'seat_arrange': 'arrange_seat',
-    'price': 'value'
+    'price': 'value',
+    'max_tickets': 'value'
 }, lockMap = {
     'value': function (dom, lock) {
         dom.prop('disabled', lock);

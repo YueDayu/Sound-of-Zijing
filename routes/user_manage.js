@@ -10,6 +10,11 @@ var checkin = require('./checkin');
 var cm = require("../weixin_basic/custom_menu");
 var act_info = require('../weixin_basic/activity_info');
 var cache = require("../weixin_handler/handler_ticket");
+var all_cache = require('../models/ticket_cache');
+
+var all_activity = all_cache.all_activity;
+var current_activity = all_cache.current_activity;
+var activity_cache = all_cache.activity_cache;
 
 var ADMIN_DB = model.admins;
 var db = model.db;
