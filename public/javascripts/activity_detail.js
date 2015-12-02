@@ -5,32 +5,32 @@
  * Time: 上午11:43
  */
 /*
-var datetimepicker_option = {
-    format: "yyyy年mm月dd日 - hh:ii",
-    autoclose: true,
-    pickerPosition: "bottom-left",
-    weekStart: 1,
-    todayBtn:  1,
-    autoclose: 1,
-    todayHighlight: 1,
-    startView: 2,
-    forceParse: 0,
-    showMeridian: 1,
-    language: 'zh-CN'
-};
+ var datetimepicker_option = {
+ format: "yyyy年mm月dd日 - hh:ii",
+ autoclose: true,
+ pickerPosition: "bottom-left",
+ weekStart: 1,
+ todayBtn:  1,
+ autoclose: 1,
+ todayHighlight: 1,
+ startView: 2,
+ forceParse: 0,
+ showMeridian: 1,
+ language: 'zh-CN'
+ };
 
-$(".form_datetime").datetimepicker(datetimepicker_option);
+ $(".form_datetime").datetimepicker(datetimepicker_option);
 
-function enableDatetimePicker(dom) {
-    dom.datetimepicker(datetimepicker_option);
-    dom.children('.input-group-addon').css('cursor', 'pointer').children().css('cursor', 'pointer');
-}
+ function enableDatetimePicker(dom) {
+ dom.datetimepicker(datetimepicker_option);
+ dom.children('.input-group-addon').css('cursor', 'pointer').children().css('cursor', 'pointer');
+ }
 
-function disableDatetimePicker(dom) {
-    dom.datetimepicker('remove');
-    dom.children('.input-group-addon').css('cursor', 'no-drop').children().css('cursor', 'no-drop');
-}
-*/
+ function disableDatetimePicker(dom) {
+ dom.datetimepicker('remove');
+ dom.children('.input-group-addon').css('cursor', 'no-drop').children().css('cursor', 'no-drop');
+ }
+ */
 
 
 var dateInterfaceMap = {
@@ -40,13 +40,13 @@ var dateInterfaceMap = {
     'hour': 'getHours',
     'minute': 'getMinutes'
 }, actionMap = {
-    'value': function(dom, value) {
+    'value': function (dom, value) {
         dom.val(value);
     },
-    'text': function(dom, value) {
+    'text': function (dom, value) {
         dom.text(value);
     },
-    'time': function(dom, value) {
+    'time': function (dom, value) {
         if (value instanceof Object) {
             var parts = dom.children(), i, len, part;
             for (i = 0, len = parts.length; i < len; ++i) {
@@ -57,7 +57,7 @@ var dateInterfaceMap = {
             }
         }
     },
-    'arrange_area': function(dom, value) {
+    'arrange_area': function (dom, value) {
         if (value instanceof Object) {
             var parts = dom.children(), i, len, part;
             for (i = 0, len = parts.length; i < len; i++) {
@@ -68,10 +68,10 @@ var dateInterfaceMap = {
             }
         }
     },
-    'button': function(dom, value) {
+    'button': function (dom, value) {
         ;
     },
-    'arrange_seat': function(dom, value) {
+    'arrange_seat': function (dom, value) {
         RenderMap();
     }
 }, keyMap = {
@@ -91,13 +91,13 @@ var dateInterfaceMap = {
     'seat_arrange': 'arrange_seat',
     'price': 'value'
 }, lockMap = {
-    'value': function(dom, lock) {
+    'value': function (dom, lock) {
         dom.prop('disabled', lock);
     },
-    'text': function(dom, lock) {
+    'text': function (dom, lock) {
         dom.prop('disabled', lock);
     },
-    'time': function(dom, lock) {
+    'time': function (dom, lock) {
         var parts = dom.children(), i, len, part;
         for (i = 0, len = parts.length; i < len; ++i) {
             part = $(parts[i]).children();
@@ -107,7 +107,7 @@ var dateInterfaceMap = {
         }
         dom.prop('disabled', lock);
     },
-    'arrange_area': function(dom, lock) {
+    'arrange_area': function (dom, lock) {
         var parts = dom.children(), i, len, part;
         for (i = 0, len = parts.length; i < len; i++) {
             part = $(parts[i]).children();
@@ -117,16 +117,16 @@ var dateInterfaceMap = {
         }
         dom.prop('disabled', lock);
     },
-    'button': function(dom, lock) {
+    'button': function (dom, lock) {
         dom.prop('disabled', lock);
     },
-    'arrange_seat': function(dom, lock) {
+    'arrange_seat': function (dom, lock) {
         if (lock == true) {
             var table = document.getElementById("tb_Seat");
             var i, j;
             if (table != null) {
-                for (i = 0; i < table.rows.length; i ++) {
-                    for (j = 0; j < table.rows[i].cells.length; j ++) {
+                for (i = 0; i < table.rows.length; i++) {
+                    for (j = 0; j < table.rows[i].cells.length; j++) {
                         table.rows[i].cells[j].onclick = null;
                     }
                 }
@@ -170,7 +170,7 @@ function initializeForm(activity) {
     for (key in keyMap) {
         actionMap[keyMap[key]]($('#input-' + key), activity[key]);
     }
-    if (activity.id){
+    if (activity.id) {
         document.getElementById("input-need_seat").selectedIndex = activity.need_seat;
         if (activity.need_seat == 1) {
             $('#div-area_arrange').show();
@@ -191,11 +191,11 @@ function initializeForm(activity) {
             $('#div-price').show();
             tb_Seat = $("#input-seat_arrange").width();
             seat = $("[class^=seat]");
-            seat.width(tb_Seat/41);
+            seat.width(tb_Seat / 41);
             seat.height(seat.width());
             seat_w = seat.width();
             seat_h = seat.height();
-            
+
             $('td').height(seat_h);
         }
         else {
@@ -239,35 +239,35 @@ function check_percent(p) {
     }
 }
 
-function checktime(){
-    var actstart = new Date($('#input-start-year').val(), $('#input-start-month').val()-1, $('#input-start-day').val(), $('#input-start-hour').val(), $('#input-start-minute').val());
-    var actend = new Date($('#input-end-year').val(), $('#input-end-month').val()-1, $('#input-end-day').val(), $('#input-end-hour').val(), $('#input-end-minute').val());
-    var bookstart = new Date($('#input-book-start-year').val(), $('#input-book-start-month').val()-1, $('#input-book-start-day').val(), $('#input-book-start-hour').val(), $('#input-book-start-minute').val());
-    var bookend = new Date($('#input-book-end-year').val(), $('#input-book-end-month').val()-1, $('#input-book-end-day').val(), $('#input-book-end-hour').val(), $('#input-book-end-minute').val());
+function checktime() {
+    var actstart = new Date($('#input-start-year').val(), $('#input-start-month').val() - 1, $('#input-start-day').val(), $('#input-start-hour').val(), $('#input-start-minute').val());
+    var actend = new Date($('#input-end-year').val(), $('#input-end-month').val() - 1, $('#input-end-day').val(), $('#input-end-hour').val(), $('#input-end-minute').val());
+    var bookstart = new Date($('#input-book-start-year').val(), $('#input-book-start-month').val() - 1, $('#input-book-start-day').val(), $('#input-book-start-hour').val(), $('#input-book-start-minute').val());
+    var bookend = new Date($('#input-book-end-year').val(), $('#input-book-end-month').val() - 1, $('#input-book-end-day').val(), $('#input-book-end-hour').val(), $('#input-book-end-minute').val());
     var now = new Date();
-    var bookend1 = new Date($('#input-book-end-year').val(), $('#input-book-end-month').val()-1, $('#input-book-end-day').val());
-    var actstart1 = new Date($('#input-start-year').val(), $('#input-start-month').val()-1, $('#input-start-day').val());
-    var be = bookend1.getTime()/(1000*60*60);
-    var as = actstart1.getTime()/(1000*60*60);
-    if(curstatus == 0){
-        if(bookstart < now){
+    var bookend1 = new Date($('#input-book-end-year').val(), $('#input-book-end-month').val() - 1, $('#input-book-end-day').val());
+    var actstart1 = new Date($('#input-start-year').val(), $('#input-start-month').val() - 1, $('#input-start-day').val());
+    var be = bookend1.getTime() / (1000 * 60 * 60);
+    var as = actstart1.getTime() / (1000 * 60 * 60);
+    if (curstatus == 0) {
+        if (bookstart < now) {
             $('#input-book-start-year').popover({
-                    html: true,
-                    placement: 'top',
-                    title:'',
-                    content: '<span style="color:red;">“订票开始时间”应晚于“当前时间”</span>',
-                    trigger: 'focus',
-                    container: 'body'
+                html: true,
+                placement: 'top',
+                title: '',
+                content: '<span style="color:red;">“订票开始时间”应晚于“当前时间”</span>',
+                trigger: 'focus',
+                container: 'body'
             });
             $('#input-book-start-year').focus();
             return false;
         }
 
-        if(bookend < bookstart){
+        if (bookend < bookstart) {
             $('#input-book-end-year').popover({
                 html: true,
                 placement: 'top',
-                title:'',
+                title: '',
                 content: '<span style="color:red;">“订票结束时间”应晚于“订票开始时间”</span>',
                 trigger: 'focus',
                 container: 'body'
@@ -278,38 +278,38 @@ function checktime(){
     }
     if (as - be < 24) {
         $('#input-start-year').popover({
-                html: true,
-                placement: 'top',
-                title:'',
-                content: '<span style="color:red;">“活动开始时间”应晚于“订票结束时间至少一天”</span>',
-                trigger: 'focus',
-                container: 'body'
+            html: true,
+            placement: 'top',
+            title: '',
+            content: '<span style="color:red;">“活动开始时间”应晚于“订票结束时间至少一天”</span>',
+            trigger: 'focus',
+            container: 'body'
         });
-         $('#input-start-year').focus();
+        $('#input-start-year').focus();
         return false;
     }
-    if(actstart < bookend){
+    if (actstart < bookend) {
         $('#input-start-year').popover({
-                html: true,
-                placement: 'top',
-                title:'',
-                content: '<span style="color:red;">“活动开始时间”应晚于“订票结束时间”</span>',
-                trigger: 'focus',
-                container: 'body'
+            html: true,
+            placement: 'top',
+            title: '',
+            content: '<span style="color:red;">“活动开始时间”应晚于“订票结束时间”</span>',
+            trigger: 'focus',
+            container: 'body'
         });
-         $('#input-start-year').focus();
+        $('#input-start-year').focus();
         return false;
     }
-    if(actend < actstart){
+    if (actend < actstart) {
         $('#input-end-year').popover({
             html: true,
             placement: 'top',
-            title:'',
+            title: '',
             content: '<span style="color:red;">“活动结束时间”应晚于“活动开始时间”</span>',
             trigger: 'focus',
             container: 'body'
         });
-         $('#input-end-year').focus();
+        $('#input-end-year').focus();
         return false;
     }
     return true;
@@ -367,51 +367,50 @@ function lockByStatus(status, book_start, start_time, end_time) {
     // true means lock, that is true means disabled
     var statusLockMap = {
         // saved but not published
-        '0': {
-        },
+        '0': {},
         // published but not determined
         '1': {
-            'name': function() {
+            'name': function () {
                 return (new Date() >= getDateByObj(start_time));
             },
             'key': true,
-            'place': function() {
+            'place': function () {
                 return (new Date() >= getDateByObj(start_time));
             },
-            'book_start': function() {
+            'book_start': function () {
                 return (new Date() >= getDateByObj(book_start));
             },
-            'book_end': function() {
+            'book_end': function () {
                 return (new Date() >= getDateByObj(start_time));
             },
-            'total_tickets': function() {
+            'total_tickets': function () {
                 return (new Date() >= getDateByObj(book_start));
             },
-            'area_arrange': function() {
+            'area_arrange': function () {
                 return (new Date() >= getDateByObj(book_start));
             },
-            'start_time': function() {
+            'start_time': function () {
                 return (new Date() >= getDateByObj(start_time));
             },
-            'end_time': function() {
+            'end_time': function () {
                 return (new Date() >= getDateByObj(start_time));
             },
-            'need_seat': function() {
+            'need_seat': function () {
                 return (new Date() >= getDateByObj(book_start));
             },
-            'description': function() {
-            	return (new Date() >= getDateByObj(start_time));
-            },
-            'pic_url': function() {
-            	return (new Date() >= getDateByObj(start_time));
-            },
-            'uploadPic': function() {
+            'description': function () {
                 return (new Date() >= getDateByObj(start_time));
             },
-            'seat_arrange': function() {
+            'pic_url': function () {
+                return (new Date() >= getDateByObj(start_time));
+            },
+            'uploadPic': function () {
+                return (new Date() >= getDateByObj(start_time));
+            },
+            'seat_arrange': function () {
                 return (new Date() >= getDateByObj(book_start));
             },
-            'price': function() {
+            'price': function () {
                 return (new Date() >= getDateByObj(book_start));
             }
         },
@@ -468,15 +467,15 @@ function showPublishByStatus(status, linetime) {
     }
 }
 
-function showPubTipsByStatus(status){
-    if(status < 1){
+function showPubTipsByStatus(status) {
+    if (status < 1) {
         $('#publishBtn').tooltip({'title': '发布后不能修改“活动名称”、“活动代称”'});
         $('#saveBtn').tooltip({'title': '暂存后可以“继续修改”'});
     }
 }
 
 function getDateString(tmpDate) {
-    var d = new Date(tmpDate.year, tmpDate.month-1, tmpDate.day, tmpDate.hour, tmpDate.minute, 0);
+    var d = new Date(tmpDate.year, tmpDate.month - 1, tmpDate.day, tmpDate.hour, tmpDate.minute, 0);
     return d.getTime().toString();
 }
 
@@ -573,21 +572,21 @@ function beforeSubmit(formData, jqForm, options) {
         'book_end': '订票结束时间',
         'need_seat': '座位分配设置',
         'area_arrange': '分区座位分配',
-        'price': '票价'
+        'price': '票价',
+        'max_tickets': '最大票数'
     }, lackArray = [], dateArray = [
         'start_time', 'end_time', 'book_start', 'book_end'
     ];
-    var d=document.getElementById("input-need_seat").value;
+    var d = document.getElementById("input-need_seat").value;
     for (i = 0, len = formData.length; i < len; ++i) {
+        console.log(formData[i]);
         if (!formData[i].value && formData[i].name != 'total_tickets' && formData[i].name != 'price') {
             lackArray.push(nameMap[formData[i].name]);
-        }
-        else if (!formData[i].value && formData[i].name == 'total_tickets') {
+        } else if (!formData[i].value && formData[i].name == 'total_tickets') {
             if (d == 0) {
                 lackArray.push(nameMap[formData[i].name]);
             }
-        }
-        else if (!formData[i].value && formData[i].name == 'price') {
+        } else if (!formData[i].value && formData[i].name == 'price') {
             if (d == 2) {
                 lackArray.push(nameMap[formData[i].name]);
             }
@@ -602,15 +601,15 @@ function beforeSubmit(formData, jqForm, options) {
     }
     //arange area
     if (d == 1) {
-        if (! $('#input-area_arrange').prop('disabled')) {
-            if (! wrapAreaArrange($('#input-area_arrange'), formData)) {
+        if (!$('#input-area_arrange').prop('disabled')) {
+            if (!wrapAreaArrange($('#input-area_arrange'), formData)) {
                 lackArray.push(nameMap['area_arrange']);
             }
         }
     }
     //arrange seat
     if (d == 2) {
-        if (! $('#input-need_seat').prop('disabled')) {
+        if (!$('#input-need_seat').prop('disabled')) {
             formData.push({
                 name: 'seat_map',
                 required: false,
@@ -618,10 +617,10 @@ function beforeSubmit(formData, jqForm, options) {
             });
             var x, y;
             var sum = 0;
-            for (x = 0; x < line; x ++) {
-                for (y = 0; y < column; y ++) {
+            for (x = 0; x < line; x++) {
+                for (y = 0; y < column; y++) {
                     if (activity.seat_map[x][y] == 2) {
-                        sum ++;
+                        sum++;
                     }
                 }
             }
@@ -632,7 +631,7 @@ function beforeSubmit(formData, jqForm, options) {
                 console.log(formData[x].name);
             }
         }
-        
+
     }
     if (lackArray.length > 0) {
         var d = $('#resultHolder');
@@ -644,7 +643,7 @@ function beforeSubmit(formData, jqForm, options) {
         }
         d.addClass("resultError");
         setResult('以下字段是必须的，请补充完整后再提交：\r\n' + lackArray.join('、'));
-        $('#continueBtn').click(function() {
+        $('#continueBtn').click(function () {
             showForm();
         });
         showResult();
@@ -688,11 +687,11 @@ function submitResponse(data) {
         appendResult('警告：' + data.warning);
     }
     if (data.updateUrl) {
-        $('#continueBtn').click(function() {
+        $('#continueBtn').click(function () {
             window.location.href = data.updateUrl;
         });
     } else {
-        $('#continueBtn').click(function() {
+        $('#continueBtn').click(function () {
             showForm();
         });
     }
@@ -725,7 +724,7 @@ function submitError(xhr) {
     }
     //setResult(xhr.responseText || '<null>');
     setResult(str);
-    $('#continueBtn').click(function() {
+    $('#continueBtn').click(function () {
         showForm();
     });
 }
@@ -736,8 +735,8 @@ function submitComplete(xhr) {
 
 
 function publishActivity() {
-    if(!$('#activity-form')[0].checkValidity || $('#activity-form')[0].checkValidity()){
-        if(!checktime())
+    if (!$('#activity-form')[0].checkValidity || $('#activity-form')[0].checkValidity()) {
+        if (!checktime())
             return false;
         showProcessing();
         setResult('');
@@ -759,7 +758,7 @@ function publishActivity() {
 initializeForm(activity);
 showForm();
 
-$('#activity-form').submit(function() {
+$('#activity-form').submit(function () {
     showProcessing();
     setResult('');
     var options = {
@@ -771,16 +770,21 @@ $('#activity-form').submit(function() {
     };
     $(this).ajaxSubmit(options);
     return false;
-}).on('reset', function() {
+}).on('reset', function () {
     initializeForm(activity);
     return false;
 });
 
-$('.form-control').on('focus', function() {var me = $(this); setTimeout(function(){me.select();}, 100)});
+$('.form-control').on('focus', function () {
+    var me = $(this);
+    setTimeout(function () {
+        me.select();
+    }, 100)
+});
 
 
-function inputNeedSeatChange(){
-    var d=document.getElementById("input-need_seat").value;
+function inputNeedSeatChange() {
+    var d = document.getElementById("input-need_seat").value;
     if (d == 1) {
         $('#div-area_arrange').show();
         $('#div-total_tickets').hide();
@@ -800,11 +804,11 @@ function inputNeedSeatChange(){
         $('#div-price').show();
         tb_Seat = $("#input-seat_arrange").width();
         seat = $("[class^=seat]");
-        seat.width(tb_Seat/41);
+        seat.width(tb_Seat / 41);
         seat.height(seat.width());
         seat_w = seat.width();
         seat_h = seat.height();
-        
+
         $('td').height(seat_h);
     }
     else {
