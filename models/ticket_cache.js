@@ -128,6 +128,10 @@ var activity_cache = function (activity_key, book_start, book_end) {
         this.save_back_timer = later.setTimeout(function () {
             this.save_to_db();
         }.bind(this), this.get_sched(moment(parseInt(book_end)).add(1, 'h')), this);
+
+        this.save_file_timer = later.setInterval(function() {
+            this.save_to_file();
+        }.bind(this), later.parse.recur().every().hour(), this);
     };
     this.pre_load = function () {
         if (current_activity[this.activity_key] != null) {
@@ -189,7 +193,7 @@ var activity_cache = function (activity_key, book_start, book_end) {
                     {'remain_tickets': this.activity_info.remain_tickets,
                      'user_map': this.user_map,
                      'seat_map': this.seat_map,
-                     'timestamp': moment().valueOf();
+                     'timestamp': moment().valueOf()
                     });
                 var filepath = snapshot_path + this.activity_key + '.tmp';
                 fs.writeFile(filepath, data, function(err) {
