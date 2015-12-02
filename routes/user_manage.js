@@ -854,7 +854,7 @@ router.post("/detail", function (req, res) {
                             db[ACTIVITY_DB].update({_id: idObj}, {$set: activity}, {multi: false}, function (err, result) {
                                 if (activity.status == 1) { // Just for the publish activities
                                     all_activity[activity._id].set_time(activity.book_start, activity.book_end);
-                                    if (current_activity[activity.key] && current_activity[activity.key] > -2) {
+                                    if (current_activity[activity.key] && current_activity[activity.key].status > -2) {
                                         lock.acquire('cache' + activity.key, function(){
                                             all_activity[activity._id].activity_info = activity;
                                             lock.release('cache' + activity.key)
@@ -968,7 +968,7 @@ router.post("/detail", function (req, res) {
                                 }
                                 if (activity.status == 1) { // Just for the publish activities
                                     all_activity[activity._id].set_time(activity.book_start, activity.book_end);
-                                    if (current_activity[activity.key] && current_activity[activity.key] > -2) {
+                                    if (current_activity[activity.key] && current_activity[activity.key].status > -2) {
                                         lock.acquire('cache' + activity.key, function(){
                                             all_activity[activity._id].activity_info = activity;
                                             lock.release('cache' + activity.key)
