@@ -18,6 +18,8 @@ var chooarea = require('./routes/choose_area');
 var logout = require('./routes/logout');
 var acquireid = require('./routes/acquireid');
 
+var ticket_cache = require('./models/ticket_cache');
+
 var app = express();
 
 process.on('uncaughtException', function(err)
@@ -91,3 +93,5 @@ app.use(function(err, req, res, next) {
 
 
 module.exports = app;
+
+ticket_cache.load_not_end_activity();
