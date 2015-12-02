@@ -46,7 +46,21 @@ exports.all_activity = all_activity;
  may need load data from temp file.
  */
 var load_not_end_activity = function () {
-
+    var current_time = moment().valueOf();
+    db[ACTIVITY_DB].find(
+        {
+            status: 1,
+            book_end: {$lt: current_time}
+        }, function(err, docs){
+            if (err || docs.length == 0) {
+                console.log("pre-load failed or no activity");
+                return;
+            }
+            for (idx in docs) {
+                var doc = docs[idx];
+                all_activity[doc.key] = new activity_cache(doc.key, doc.book_start, doc.book_end);
+            }
+        });
 };
 exports.load_not_end_activity = load_not_end_activity;
 
