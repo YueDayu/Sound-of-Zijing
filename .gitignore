@@ -42,6 +42,6 @@ db/
 
 redis.conf
 
-snapshot/
+snapshot/*
 
 address_configure.js

@@ -18,7 +18,7 @@ var ACTIVITY_DB = model.activities;
 var SEAT_DB = model.seats;
 var TICKET_DB = model.tickets;
 
-var snapshot_path = "../snapshot/"
+var snapshot_path = "./snapshot/"
 
 later.date.localTime();
 
@@ -62,7 +62,10 @@ var load_not_end_activity = function () {
             for (idx in docs) {
                 var doc = docs[idx];
                 all_activity[doc.key] = new activity_cache(doc.key, doc.book_start, doc.book_end);
-                all_activity[doc.key].restore_from_file();
+                if (moment(parseInt(doc.book_start)).subtract(5, 'm').isBefore())
+                {
+                    all_activity[doc.key].pre_load();
+                }
             }
         });
 };
@@ -128,10 +131,6 @@ var activity_cache = function (activity_key, book_start, book_end) {
         this.save_back_timer = later.setTimeout(function () {
             this.save_to_db();
         }.bind(this), this.get_sched(moment(parseInt(book_end)).add(1, 'h')), this);
-
-        this.save_file_timer = later.setInterval(function() {
-            this.save_to_file();
-        }.bind(this), later.parse.recur().every().hour(), this);
     };
     this.pre_load = function () {
         if (current_activity[this.activity_key] != null) {
@@ -168,11 +167,19 @@ var activity_cache = function (activity_key, book_start, book_end) {
                             console.log('pre-load is finished! key: ' + this.activity_key);
                             current_activity[this.activity_key].status = -1;
                             lock.release('cache' + this.activity_key);
+                            this.restore_from_file();
+                            if ((new Date()).getTime() > this.activity_info.book_start) {
+                                this.book_start_event();
+                            }
                         }.bind(this));
                     } else { // finished
                         console.log('pre-load is finished! key: ' + this.activity_key);
                         current_activity[this.activity_key].status = -1;
                         lock.release('cache' + this.activity_key);
+                        this.restore_from_file();
+                        if ((new Date()).getTime() > this.activity_info.book_start) {
+                            this.book_start_event();
+                        }
                     }
                 }.bind(this));
         }.bind(this));
@@ -184,34 +191,36 @@ var activity_cache = function (activity_key, book_start, book_end) {
             console.log(this.activity_key + ' started!');
             current_activity[this.activity_key].status = 0;
             lock.release('cache' + this.activity_key);
+            this.save_file_timer = later.setInterval(function() {
+                this.save_to_file();
+            }.bind(this), later.parse.recur().every().hour(), this);
         }.bind(this));
     };
     this.save_to_file = function () {
         lock.acquire('cache' + this.activity_key, function() {
-            if (current_activity[this.activity_key].status >= -1) {
+            if (current_activity[this.activity_key] && current_activity[this.activity_key].status >= -1) {
                 var data = JSON.stringify(
                     {'remain_tickets': this.activity_info.remain_tickets,
                      'user_map': this.user_map,
-                     'seat_map': this.seat_map,
-                     'timestamp': moment().valueOf()
+                     'seat_map': this.seat_map
                     });
-                var filepath = snapshot_path + this.activity_key + '.tmp';
+                var filepath = snapshot_path + this.activity_info._id + '.tmp';
                 fs.writeFile(filepath, data, function(err) {
                     if (err) {
                         //TODO handle bad saved files
                         console.log('Error saving snapshot. key=' + this.activity_key)
                     }
                     lock.release('cache' + this.activity_key);
-                });
+                }.bind(this));
             } else {
                 lock.release('cache' + this.activity_key);
             }
-        }).bind(this);
+        }.bind(this));
     };
     this.restore_from_file = function () {
         lock.acquire('cache' + this.activity_key, function() {
-            if (current_activity[this.activity_key].status >= -1) {
-                var filepath = snapshot_path + this.activity_key + '.tmp';
+            if (current_activity[this.activity_key] && current_activity[this.activity_key].status >= -1) {
+                var filepath = snapshot_path + this.activity_info._id + '.tmp';
                 fs.readFile(filepath, function(err, rawdata) {
                     if (err) {
                         console.log('Snapshot file read failed. key=' + this.activity_key);
@@ -222,11 +231,11 @@ var activity_cache = function (activity_key, book_start, book_end) {
                         this.seat_map = data['seat_map'];
                     }
                     lock.release('cache' + this.activity_key);
-                });
+                }.bind(this));
             } else {
                 lock.release('cache' + this.activity_key);
             }
-        }).bind(this);
+        }.bind(this));
     };
     // TODO: disable the time which saved files.
     this.book_end_event = function () {
@@ -240,6 +249,10 @@ var activity_cache = function (activity_key, book_start, book_end) {
         }.bind(this));
     };
     this.save_to_db = function () {
+        if (this.save_file_timer != null) {
+            this.save_file_timer.clear();
+            this.save_file_timer = null;
+        }
         lock.acquire('cache' + this.activity_key, function () {
             if (current_activity[this.activity_key].status == 1) {
                 current_activity[this.activity_key].status = 2;
