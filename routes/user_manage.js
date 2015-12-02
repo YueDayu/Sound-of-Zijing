@@ -10,6 +10,7 @@ var checkin = require('./checkin');
 var cm = require("../weixin_basic/custom_menu");
 var act_info = require('../weixin_basic/activity_info');
 var cache = require("../weixin_handler/handler_ticket");
+var all_cache = require("../models/ticket_cache");
 
 var ADMIN_DB = model.admins;
 var db = model.db;
@@ -17,6 +18,10 @@ var getIDClass = model.getIDClass;
 var ACTIVITY_DB = model.activities;
 var TICKET_DB = model.tickets;
 var SEAT_DB = model.seats;
+
+var current_activity = all_cache.current_activity;
+var all_activity = all_cache.all_activity;
+var activity_cache = all_cache.activity_cache;
 
 var seat_row_2 = 8;
 var seat_col_2 = 40;
@@ -206,9 +211,7 @@ router.get("/detail", function (req, res) {
     if (!req.query.actid) {
         var activity = {name: "新建活动"};
         res.render("activity_detail", {activity: activity});
-        return;
-    }
-    else {
+    } else {
         var idObj = getIDClass(req.query.actid);
         lock.acquire(ACTIVITY_DB, function () {
             db[ACTIVITY_DB].find({_id: idObj}, function (err, docs) {
