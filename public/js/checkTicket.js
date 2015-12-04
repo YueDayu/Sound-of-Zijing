@@ -3,6 +3,17 @@ var status;
 var max_width;
 var ticketIdTransferd;
 
+/*
+
+needseat = 0 ->不需选座
+needseat = 1 ->综体
+needseat = 2 ->新清演出
+
+validrefund = 1 ->可以退票
+validrefund = 0 ->不可退票
+
+
+*/
 window.onload = function(){
     status = ticket.status;
     width=$(".cz_order").width();
@@ -15,6 +26,34 @@ window.onload = function(){
 
     if(isIE()){
         $("#isIE").css("display", "");
+    }
+    displayButton();
+
+}
+
+function displayButton(){
+    console.log(needseat);
+    console.log(validrefund);
+    if(needseat == 0){      //不需要选座,只有退票按钮
+        if(validrefund== 1){
+            $(".refundButton").css('width','95%');
+            $('.refundButton').css('display','block');
+
+        }
+    }
+    else{               //需要选座
+        if(validrefund == 1) {   //可以退票
+            $(".refundButton,.seatButton").css('width', '45%');
+            $(".refundButton,.seatButton").css('display', 'block');
+            $(".refundButton,.seatButton").css('display', 'block');
+            $(".refundButton,.seatButton").css('float', 'left');
+            $(".refundButton,.seatButton").css('margin-left', '10px');
+        }
+        else{
+            $(".seatButton").css('width','95%');
+            $('.seatButton').css('display','block');
+        }
+
     }
 }
 
@@ -72,8 +111,8 @@ function initETicket(){
     else{
         $("#ticket_ddl").remove();
         $("#noteMessage").remove();
-        $("#seatEntrance").css("display", "none");
-        $("#needButton").css("display", "none");
+        $("#seatEntrance").css("display", "");
+        $("#needButton").css("display", "");
     }
 }
 
@@ -149,13 +188,13 @@ $("#eTicket").click(function(){
     $("#eTicket").attr("class", "active");
     $("#guideMap-zt").css("display", "none");
     $("#guideMap-xq").css("display", "none");
-
+    /*
     if(status > 3 || status < 1)
         status = 0;
     if(status < 2){
         $("#seatEntrance").css("display", "");
     }
-    
+    */
     $(".cz_order").css("display", "");
 });
 
@@ -176,7 +215,8 @@ $("#mapGuide").click(function(){
     }
     $("#eTicket").attr("class", "");
     $("#mapGuide").attr("class", "active");
-    $("#seatEntrance").css("display", "none");
+    $("#seatEntrance").css("display", "");
+   // $("#seatEntrance").css("display", "none");
     $(".cz_order").css("display", "none");
 
     initMapZt();
