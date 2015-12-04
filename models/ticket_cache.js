@@ -49,7 +49,7 @@ exports.all_activity = all_activity;
  may need load data from temp file.
  */
 var load_not_end_activity = function () {
-    var current_time = moment().subtract(1, 'h').subtract(5, 'h').valueOf();
+    var current_time = moment().subtract(1, 'h').subtract(5, 'm').valueOf();
     db[ACTIVITY_DB].find(
         {
             status: 1,
@@ -196,6 +196,13 @@ var activity_cache = function (activity_key, book_start, book_end) {
         }.bind(this));
     };
     this.save_to_file = function () {
+        var filepath;
+        if (this.activity_info._id) {
+            filepath = snapshot_path + this.activity_info._id + '.tmp';
+        } else {
+            filepath = snapshot_path + arguments[0] + '.tmp';
+        }
+        console.log(filepath);
         lock.acquire('cache' + this.activity_key, function() {
             if (current_activity[this.activity_key] && current_activity[this.activity_key].status >= -1) {
                 var data = JSON.stringify(
@@ -205,15 +212,21 @@ var activity_cache = function (activity_key, book_start, book_end) {
                      'status': current_activity[this.activity_key].status
                     });
                 lock.release('cache' + this.activity_key);
-                var filepath = snapshot_path + this.activity_info._id + '.tmp';
                 fs.writeFile(filepath, data, function(err) {
                     if (err) {
                         //TODO handle bad saved files
                         console.log('Error saving snapshot. key=' + this.activity_key);
                     }
+                    console.log('snapshot file saved');
                 }.bind(this));
             } else {
                 lock.release('cache' + this.activity_key);
+                fs.writeFile(filepath, JSON.stringify({'status': 2}), function(err) {
+                    if (err) {
+                        console.log('Error saving snapshot. key=' + this.activity_key);
+                    }
+                    console.log('snapshot file saved');
+                }.bind(this));
             }
         }.bind(this));
     };
@@ -241,13 +254,16 @@ var activity_cache = function (activity_key, book_start, book_end) {
     };
 
     this.restore_events = function () {
-        if (current_activity[this.activity_key].status == -1 && moment.parseInt(this.activity_info.book_start).isBefore()) {
+        if (current_activity[this.activity_key].status == 2) {
+            return;
+        }
+        if (current_activity[this.activity_key].status == -1 && moment(parseInt(this.activity_info.book_start)).isBefore()) {
             this.book_start_event();
         }
-        if (current_activity[this.activity_key].status == 0 && moment.parseInt(this.activity_info.book_end).isBefore()) {
+        if (current_activity[this.activity_key].status == 0 && moment(parseInt(this.activity_info.book_end)).isBefore()) {
             this.book_end_event();
         }
-        if (current_activity[this.activity_key].status == 1 && moment.parseInt(this.activity_info.book_end).add(1, 'h').isBefore()) {
+        if (current_activity[this.activity_key].status == 1 && moment(parseInt(this.activity_info.book_end)).add(1, 'h').isBefore()) {
             this.save_to_db();
         }
     };
@@ -257,6 +273,7 @@ var activity_cache = function (activity_key, book_start, book_end) {
         lock.acquire('cache' + this.activity_key, function () {
             if (current_activity[this.activity_key].status == 0) {
                 current_activity[this.activity_key].status = 1;
+                console.log('activity ' + this.activity_key + 'book_end');
             } else {
                 console.log('error on ending the activity. key: ' + this.activity_key);
             }
@@ -270,6 +287,7 @@ var activity_cache = function (activity_key, book_start, book_end) {
         }.bind(this));
     };
     this.save_to_db = function () {
+        console.log('save to db');
         if (this.save_file_timer != null) {
             this.save_file_timer.clear();
             this.save_file_timer = null;
@@ -283,7 +301,7 @@ var activity_cache = function (activity_key, book_start, book_end) {
                 return;
             }
             var save_item_num = this.all_ticket_num - this.activity_info.remain_tickets + 1;
-            if (this.activity_info.need_seat() != 0) { // save sear data.
+            if (this.activity_info.need_seat != 0) { // save sear data.
                 save_item_num++;
                 db[SEAT_DB].update({
                     activity: this.activity_info._id
@@ -295,7 +313,7 @@ var activity_cache = function (activity_key, book_start, book_end) {
                         this.clear_activity();
                         all_activity[id] = null;
                         lock.release('cache' + this.activity_key);
-                        this.save_to_file();
+                        this.save_to_file(id);
                     }
                 }.bind(this));
             }
@@ -313,7 +331,7 @@ var activity_cache = function (activity_key, book_start, book_end) {
                     this.clear_activity();
                     all_activity[id] = null;
                     lock.release('cache' + this.activity_key);
-                    this.save_to_file();
+                    this.save_to_file(id);
                 }
             }.bind(this));
             for (var stu_index in this.user_map) {
@@ -327,7 +345,7 @@ var activity_cache = function (activity_key, book_start, book_end) {
                             this.clear_activity();
                             all_activity[id] = null;
                             lock.release('cache' + this.activity_key);
-                            this.save_to_file();
+                            this.save_to_file(id);
                         }
                     }.bind(this));
                 }

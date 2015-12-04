@@ -428,8 +428,8 @@ router.post("/detail", function (req, res) {
                         lock.release(ACTIVITY_DB);
                         return;
                     }
-                    if (moment(activity["book_start"]).isBefore()) {
-                        res.send("404#抢票开始时间早于当前时间！请重新检查。");
+                    if (moment(activity["book_start"]).subtract(10, 'm').isBefore()) {
+                        res.send("404#抢票开始时间应晚于当前时间10分钟后！请重新检查。");
                         lock.release(ACTIVITY_DB);
                         return;
                     }
@@ -510,9 +510,7 @@ router.post("/detail", function (req, res) {
                         activity["description"] = activity["description"].replace(/\r?\n/g, "\\n");
                     db[ACTIVITY_DB].insert(activity, function (err, doc) {
                         if (activity.status == 1) { // Just for the publish activities
-                            console.log(doc);
                             all_activity[doc._id] = new activity_cache(activity.key, activity.book_start, activity.book_end);
-                            console.log(all_activity);
                         }
                         if (activity["need_seat"] != 0) {
                             db[ACTIVITY_DB].find({key: activity["key"], $or: [{status: 0}, {status: 1}]},
@@ -603,8 +601,8 @@ router.post("/detail", function (req, res) {
                         lock.release(ACTIVITY_DB);
                         return;
                     }
-                    if (moment(activity["book_start"]).isBefore()) {
-                        res.send("404#抢票开始时间早于当前时间！请重新检查。");
+                    if (moment(activity["book_start"]).subtract(10, 'm').isBefore()) {
+                        res.send("404#抢票开始时间应晚于当前10分后！请重新检查。");
                         lock.release(ACTIVITY_DB);
                         return;
                     }
@@ -817,17 +815,16 @@ router.post("/detail", function (req, res) {
                             lock.release(ACTIVITY_DB);
                             return;
                         }
-                        if(moment().isBetween(moment(docs[0]["book_start"]),moment(docs[0]["book_start"]).add(10,'m')))
-                        {
-                            res.send("404#活动开始后10分钟不允许修改");
+                        if (moment(docs[0]["book_end"]).isBefore()) {
+                            res.send("404#抢票结束后不允许修改");
                             lock.release(ACTIVITY_DB);
                             return;
                         }
-                        if(moment().isBetween(moment(docs[0]["book_end"]).subtract(5,'m'),moment(docs[0]["book_end"]))){
-                            res.send("404#活动结束前5分钟不允许修改");
+                        if (moment(docs[0]["book_end"]).subtract(5, 'm').isBefore()) {
+                            res.send("404#抢票结束前5min不允许修改");
                             lock.release(ACTIVITY_DB);
                             return;
-                        }                        
+                        }
                         if (moment(docs[0]["book_start"]).isBefore()) //抢票已经开始
                         {
                             if (activity["book_start"]) {
@@ -837,6 +834,11 @@ router.post("/detail", function (req, res) {
                             }
                             if (moment(activity["book_end"]).isBefore(docs[0]["book_start"])) {
                                 res.send("404#抢票结束时间早于开始时间！请重新检查。");
+                                lock.release(ACTIVITY_DB);
+                                return;
+                            }
+                            if (moment(activity["book_end"]).subtract(5, 'm').isBefore()) {
+                                res.send("404#抢票结束时间应晚于当前时间5min");
                                 lock.release(ACTIVITY_DB);
                                 return;
                             }
@@ -868,14 +870,19 @@ router.post("/detail", function (req, res) {
                             }
                             if (activity["description"])
                                 activity["description"] = activity["description"].replace(/\r?\n/g, "\\n");
+
+                            var updated_act = docs[0];
+                            for (var idx in activity) {
+                                updated_act[idx] = activity[idx];
+                            }
+
                             db[ACTIVITY_DB].update({_id: idObj}, {$set: activity}, {multi: false}, function (err, result) {
-                                if (activity.status == 1) { // Just for the publish activities
-                                    console.log(all_activity);
-                                    all_activity[idObj].set_time(activity.book_start, activity.book_end);
-                                    if (current_activity[activity.key] && current_activity[activity.key].status > -2) {
-                                        lock.acquire('cache' + activity.key, function(){
-                                            all_activity[idObj].activity_info = activity;
-                                            lock.release('cache' + activity.key)
+                                if (docs[0].status == 1) { // Just for the publish activities
+                                    all_activity[idObj].set_time(updated_act.book_start, updated_act.book_end);
+                                    if (current_activity[updated_act.key] && current_activity[updated_act.key].status > -2) {
+                                        lock.acquire('cache' + updated_act.key, function(){
+                                            all_activity[idObj].activity_info = updated_act;
+                                            lock.release('cache' + updated_act.key)
                                         });
                                     }
                                 }
@@ -896,6 +903,17 @@ router.post("/detail", function (req, res) {
                         } else { //抢票还没开始
                             if (moment(activity["book_end"]).isBefore(docs[0]["book_start"])) {
                                 res.send("404#抢票结束时间早于开始时间！请重新检查。");
+                                lock.release(ACTIVITY_DB);
+                                return;
+                            }
+                            if (moment(docs[0]["book_start"]).subtract(10, 'm').isBefore()) {
+                                if (activity["book_start"] != docs[0]["book_start"]) {
+                                    res.send("404#抢票开始前10min不允许修改开始时间。");
+                                    lock.release(ACTIVITY_DB);
+                                    return;
+                                }
+                            } else if (moment(activity["book_start"]).subtract(10, 'm').isBefore()) {
+                                res.send("404#抢票开始时间应晚于当前10min后");
                                 lock.release(ACTIVITY_DB);
                                 return;
                             }
@@ -978,18 +996,24 @@ router.post("/detail", function (req, res) {
 
                             if (activity["description"])
                                 activity["description"] = activity["description"].replace(/\r?\n/g, "\\n");
+
+                            var updated_act = docs[0];
+                            for (var idx in activity) {
+                                updated_act[idx] = activity[idx];
+                            }
+
                             db[ACTIVITY_DB].update({_id: idObj}, {$set: activity}, {multi: false}, function (err, result) {
                                 if (err || result.n != 1) {
                                     res.send("404#修改活动失败，没有此ID对应的活动！");
                                     lock.release(ACTIVITY_DB);
                                     return;
                                 }
-                                if (activity.status == 1) { // Just for the publish activities
-                                    all_activity[idObj].set_time(activity.book_start, activity.book_end);
-                                    if (current_activity[activity.key] && current_activity[activity.key].status > -2) {
-                                        lock.acquire('cache' + activity.key, function(){
-                                            all_activity[idObj].activity_info = activity;
-                                            lock.release('cache' + activity.key)
+                                if (updated_act.status == 1) { // Just for the publish activities
+                                    all_activity[idObj].set_time(updated_act.book_start, updated_act.book_end);
+                                    if (current_activity[updated_act.key] && current_activity[updated_act.key].status > -2) {
+                                        lock.acquire('cache' + updated_act.key, function(){
+                                            all_activity[idObj].activity_info = updated_act;
+                                            lock.release('cache' + updated_act.key)
                                         });
                                     }
                                 }
