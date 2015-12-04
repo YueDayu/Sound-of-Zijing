@@ -813,6 +813,17 @@ router.post("/detail", function (req, res) {
                             lock.release(ACTIVITY_DB);
                             return;
                         }
+                        if(moment().isBetween(moment(docs[0]["book_start"]),moment(docs[0]["book_start"]).add(10,'m')))
+                        {
+                            res.send("404#活动开始后10分钟不允许修改");
+                            lock.release(ACTIVITY_DB);
+                            return;
+                        }
+                        if(moment().isBetween(moment(docs[0]["book_end"]).subtract(5,'m'),moment(docs[0]["book_end"]))){
+                            res.send("404#活动结束前5分钟不允许修改");
+                            lock.release(ACTIVITY_DB);
+                            return;
+                        }                        
                         if (moment(docs[0]["book_start"]).isBefore()) //抢票已经开始
                         {
                             if (activity["book_start"]) {
