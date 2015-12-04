@@ -49,7 +49,7 @@ exports.all_activity = all_activity;
  may need load data from temp file.
  */
 var load_not_end_activity = function () {
-    var current_time = moment().substract(1, 'h').substract(5, 'h').valueOf();
+    var current_time = moment().subtract(1, 'h').subtract(5, 'h').valueOf();
     db[ACTIVITY_DB].find(
         {
             status: 1,
@@ -188,7 +188,7 @@ var activity_cache = function (activity_key, book_start, book_end) {
             this.save_to_file();
             this.save_file_timer = later.setInterval(function() {
                 this.save_to_file();
-            }.bind(this), later.parse.recur().every().hour(), this);
+            }.bind(this), later.parse.recur().every(31).minute().after(1).minute(), this);
         }.bind(this));
     };
     this.save_to_file = function () {
@@ -258,6 +258,11 @@ var activity_cache = function (activity_key, book_start, book_end) {
             }
             lock.release('cache' + this.activity_key);
             this.save_to_file();
+            if (this.save_file_timer === null) {
+                this.save_file_timer = later.setInterval(function() {
+                    this.save_to_file();
+                }.bind(this), later.parse.recur().every(31).minute().after(1).minute(), this);
+            }
         }.bind(this));
     };
     this.save_to_db = function () {
