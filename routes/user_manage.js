@@ -79,9 +79,9 @@ router.post("/delete", function (req, res) {
                     res.send("数据库查找不到要删除的活动！");
                     lock.release(ACTIVITY_DB);
                 } else {
-                    if (all_activity[activity._id]) {
-                        all_activity[activity._id].clear_activity();
-                        all_activity[activity._id] = null;
+                    if (all_activity[idObj]) {
+                        all_activity[idObj].clear_activity();
+                        all_activity[idObj] = null;
                     }
                     if (current_activity[activity.key]) {
                         current_activity[activity.key] = null;
@@ -387,6 +387,8 @@ router.post("/detail", function (req, res) {
         activity.book_end = parseInt(activity["book_end"]);
     if (activity.need_seat)
         activity.need_seat = parseInt(activity["need_seat"]);
+    if (activity.max_tickets)
+        activity.max_tickets = parseInt(activity["max_tickets"]);
 
     if (req.body.id == undefined) //新建活动
     {
@@ -506,9 +508,11 @@ router.post("/detail", function (req, res) {
                     }
                     if (activity["description"])
                         activity["description"] = activity["description"].replace(/\r?\n/g, "\\n");
-                    db[ACTIVITY_DB].insert(activity, function () {
+                    db[ACTIVITY_DB].insert(activity, function (err, doc) {
                         if (activity.status == 1) { // Just for the publish activities
-                            all_activity[activity._id] = new activity_cache(activity.key, activity.book_start, activity.book_end);
+                            console.log(doc);
+                            all_activity[doc._id] = new activity_cache(activity.key, activity.book_start, activity.book_end);
+                            console.log(all_activity);
                         }
                         if (activity["need_seat"] != 0) {
                             db[ACTIVITY_DB].find({key: activity["key"], $or: [{status: 0}, {status: 1}]},
@@ -691,7 +695,7 @@ router.post("/detail", function (req, res) {
                                         return;
                                     }
                                     if (activity.status == 1) { // Just for the publish activities
-                                        all_activity[activity._id] = new activity_cache(activity.key, activity.book_start, activity.book_end);
+                                        all_activity[idObj] = new activity_cache(activity.key, activity.book_start, activity.book_end);
                                     }
                                     if (activity["need_seat"] == 1) {
                                         var ar = {
@@ -866,10 +870,11 @@ router.post("/detail", function (req, res) {
                                 activity["description"] = activity["description"].replace(/\r?\n/g, "\\n");
                             db[ACTIVITY_DB].update({_id: idObj}, {$set: activity}, {multi: false}, function (err, result) {
                                 if (activity.status == 1) { // Just for the publish activities
-                                    all_activity[activity._id].set_time(activity.book_start, activity.book_end);
+                                    console.log(all_activity);
+                                    all_activity[idObj].set_time(activity.book_start, activity.book_end);
                                     if (current_activity[activity.key] && current_activity[activity.key].status > -2) {
                                         lock.acquire('cache' + activity.key, function(){
-                                            all_activity[activity._id].activity_info = activity;
+                                            all_activity[idObj].activity_info = activity;
                                             lock.release('cache' + activity.key)
                                         });
                                     }
@@ -980,10 +985,10 @@ router.post("/detail", function (req, res) {
                                     return;
                                 }
                                 if (activity.status == 1) { // Just for the publish activities
-                                    all_activity[activity._id].set_time(activity.book_start, activity.book_end);
+                                    all_activity[idObj].set_time(activity.book_start, activity.book_end);
                                     if (current_activity[activity.key] && current_activity[activity.key].status > -2) {
                                         lock.acquire('cache' + activity.key, function(){
-                                            all_activity[activity._id].activity_info = activity;
+                                            all_activity[idObj].activity_info = activity;
                                             lock.release('cache' + activity.key)
                                         });
                                     }
