@@ -1,14 +1,14 @@
-﻿<!DOCTYPE html>
-<html>
+<!DOCTYPE html>
+<html xmlns:display="http://www.w3.org/1999/xhtml" xmlns:height="http://www.w3.org/1999/xhtml">
 
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, maximum-scale=1, initial-scale=1, user-scalable=no">
     <title>我的票夹</title>
 
-    <link href="css/style.min.css" type="text/css" rel="stylesheet">
-    <link href="css/checkTicket.css" type="text/css" rel="stylesheet">
-    <script type="text/javascript" src="/lib/jq/jquery-1.10.2.min.js"></script>
+    <link href="/css/style.min.css" type="text/css" rel="stylesheet">
+    <link href="/css/checkTicket.css" type="text/css" rel="stylesheet">
+    <script src="/lib/jq/jquery-1.10.2.min.js" type="text/javascript" charset="utf-8"></script>
 </head>
 
 <body>
@@ -35,7 +35,6 @@
                 <p class="text" id="ticket_place">场馆：</p>
                 <p class="text" id="ticket_time">日期：</p>
                 <p class="text" id="ticket_seat" style="display:none">座位：</p>
-                <p class="text" id="ticket_cancel">退票方式：回复 "退票"+"新年音乐会"</p>
 
                 <br>
                 <b></b>
@@ -49,8 +48,12 @@
                     <p class="text"> 换票方式： 凭二维码支付并换取纸质票</p>
                     <p id="bookHall" class="text"> </p>
                 </div>
-                <p id="ticket_ddl" class="text" >选票截止时间</p>
-                <div id="qrcodeWrap">
+                <p id="ticket_ddl" class="text" >选座截止时间</p>
+
+                <div id="display_qrcodeWrap_div">
+                    <img src="/img/act1.jpg" id="display_qrcodeWrap"> //图片链接待修改
+                </div>
+                <div id="qrcodeWrap" style="display:none;">
                     <div id="qrcode"></div>
                     <div id="noteMessage" style="display:none;">
                         <a id="noteLink" class="seatButton" style="background:none;color:#000">
@@ -117,11 +120,13 @@
     </section>
 
     <!--选座链接部分-->
-    <section class="info" id="seatEntrance" style="display:none;">
-        <div class="btn" style="height:58px">
-          <a class="seatButton" href=""><i class="icon-cart"></i>进入选座</a>
-        </div>
-    </section>
+    <section class="info" id="seatEntrance" >
+        <div class="btn" style="height:58px" >
+        <a class="seatButton" style="display:none; "href=""><i class="icon-cart"></i>选座</a>
+        <a class="refundButton" style="display:none;" href=""><i class="icon-cart"></i>退票</a>
+        <a class="no_refundButton" style="display:none;" href="">退票期限已过</a>
+      </div>
+  </section>
     <!--为button留出空间-->
     <div id="needButton" style="height:30px; display:none"></div>
 </body>
@@ -130,7 +135,7 @@
     //测试用
     var ticket = new Object();
     ticket.id = "<%= tid %>";
-    ticket.title="<%= act_name %>";
+    ticket.title ="<%= act_name %>";
     ticket.name = "<%= act_key %>";      //退票的活动代称
     ticket.place = "<%= act_place %>";
     ticket.time = "<%= act_begintime %>";
@@ -139,15 +144,34 @@
     ticket.status = <%= ticket_status %>;              //status=1, "等待选座"， status=2, "等待检票", status=3, "已检票"
     ticket.seatddl = "<%= act_book_end %>";
     ticket.needseat = <%= act_need_seat %>;
+    ticket.validrefund = <%= act_valid_refund %>;           //0不可退票，1可以退票，这是新增的变量！！
     var netWorkType;
-
     ticket.price = <%= ticket_price %>;
     ticket.hall = "清华学堂售票窗口";
     ticket.isPaid = <%= has_paid %>;
 
+/*
+    var ticket = new Object();
+    ticket.id = "<%= tid %>";
+    ticket.title = "<%= act_name %>";
+    ticket.name = "<%= act_key %>";      //退票的活动代称
+    ticket.place = "zongti";
+    ticket.time = "<%= act_begintime %>";
+    ticket.seat = "A区";              //ticket.seat = "A区";
+    ticket.qrcode_img="<%= act_photo %>";
+    ticket.status = 1;             //status=1, "等待选座"， status=2, "等待检票", status=3, "已检票"
+    ticket.seatddl = "<%= act_book_end %>";
+    ticket.needseat = 1;              //0，不可选座；1，可以选座
+    ticket.validrefund = 1;           //0不可退票，1可以退票
+    var netWorkType;
+    ticket.price = 12;
+    ticket.hall = "清华学堂售票窗口";
+    ticket.isPaid = 0;
+/*
+
 </script>
-<script src="js/netWorkType.js" type="text/javascript" charset="utf-8"></script>
-<script src="js/createqrcode.js" type="text/javascript" charset="utf-8"></script>
-<script src="js/qrcode.js" type="text/javascript" charset="utf-8"></script>
-<script src="js/checkTicket.js" type="text/javascript" charset="utf-8"></script>
+<script src="/js/netWorkType.js" type="text/javascript" charset="utf-8"></script>
+<script src="/js/createqrcode.js" type="text/javascript" charset="utf-8"></script>
+<script src="/js/qrcode.js" type="text/javascript" charset="utf-8"></script>
+<script src="/js/checkTicket.js" type="text/javascript" charset="utf-8"></script>
 </html>

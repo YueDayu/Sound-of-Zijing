@@ -3,6 +3,17 @@ var status;
 var max_width;
 var ticketIdTransferd;
 
+/*
+
+needseat = 0 ->不需选座
+needseat = 1 ->综体
+needseat = 2 ->新清演出
+
+validrefund = 1 ->可以退票
+validrefund = 0 ->不可退票
+
+
+*/
 window.onload = function(){
     status = ticket.status;
     width=$(".cz_order").width();
@@ -16,11 +27,83 @@ window.onload = function(){
     if(isIE()){
         $("#isIE").css("display", "");
     }
+    displayButton();
+
+}
+
+$("#display_qrcodeWrap_div").click(function(){
+  $("#display_qrcodeWrap_div").css('display', 'none');
+  $("#qrcodeWrap").css('display', '');
+})
+
+$("#qrcode").click(function(){
+  $("#display_qrcodeWrap_div").css('display', '');
+  $("#qrcodeWrap").css('display', 'none');
+})
+
+function displayButton(){
+    console.log(ticket.needseat);
+    console.log(ticket.validrefund);
+      if (ticket.status > 1){
+    ticket.needseat = 0;
+    }
+    if(ticket.needseat == 0){      //不需要选座,只有退票按钮
+        if(ticket.validrefund== 1){
+            $('.refundButton').css('width','95%');
+            $('.refundButton').css('display','block');
+            $('.refundButton').attr("href", "javascript:refundConfirm()");
+        }else{
+            $('.no_refundButton').css('width','95%');
+            $('.no_refundButton').css('display','block');
+            $('.no_refundButton').attr("href", "javascript:refundConfirm()");
+        }
+    }
+    else{               //需要选座
+        if(ticket.validrefund == 1) {   //可以退票
+            $('.refundButton,.seatButton').css('width', '45%');
+            $('.refundButton,.seatButton').css('display', 'block');
+            $('.refundButton,.seatButton').css('display', 'block');
+            $('.refundButton,.seatButton').css('float', 'left');
+            $('.refundButton,.seatButton').css('margin-left', '10px');
+            $('.refundButton').attr("href", "javascript:refundConfirm()");
+        }
+        else{
+          $('.no_refundButton,.seatButton').css('width', '45%');
+          $('.no_refundButton,.seatButton').css('display', 'block');
+          $('.no_refundButton,.seatButton').css('display', 'block');
+          $('.no_refundButton,.seatButton').css('float', 'left');
+          $('.no_refundButton,.seatButton').css('margin-left', '10px');
+          $('.no_refundButton').attr("href", "javascript:refundConfirm()");
+        }
+
+    }
+}
+
+function refundConfirm(){
+    var info = "您确定要退票吗?<br><br><btn id = 'confirm_rfd_btn'>确认</btn>"+
+        "&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp" +
+            "<btn id = 'cancel_rfd_btn'>取消</btn>";
+
+    $("#alertInfo").html(info);
+    $("#alertFrame").css("display", "inherit");
+    $("#alertFrame").animate({
+        top: '50%',
+        opacity: '.9',
+    }, 500, function(){
+
+    });
+    $('#confirm_rfd_btn').click(function(){
+        //把退票信息传给服务器
+
+    });
+    $('#cancel_rfd_btn').click(function(){
+        $("#alertFrame").css("display", "none");
+    });
 }
 
 function isIE(){
     var a1 = navigator.userAgent;
-    var yesIE = a1.search(/Trident/i); 
+    var yesIE = a1.search(/Trident/i);
     if(yesIE > 0){
         return true;
     }
@@ -28,7 +111,7 @@ function isIE(){
         return false;
     }
 
-}  
+}
 
 function transferTicketId(){
     var str = ticket.id.substring(0,12);
@@ -72,8 +155,8 @@ function initETicket(){
     else{
         $("#ticket_ddl").remove();
         $("#noteMessage").remove();
-        $("#seatEntrance").css("display", "none");
-        $("#needButton").css("display", "none");
+        $("#seatEntrance").css("display", "");
+        $("#needButton").css("display", "");
     }
 }
 
@@ -95,7 +178,7 @@ function setValue(){
     var status = ticket.status;
     if(status > 3 || status < 1)
         status = 0;
-    
+
     if(ticket.needseat == 2 && ticket.status == 2 && !ticket.isPaid){
         $("#ticket_status").html("等待支付");
     }
@@ -111,7 +194,7 @@ function setValue(){
     $("#ticket_ddl").html("选座截止时间： "+ticket.seatddl);
     $("#ticket_seat").html("座位："+seat);
     $("#ticket_place").html("场馆："+ticket.place);
-    
+
     $("#ticket_cancel").html("退票方式：回复 '退票 "+ ticket.name + "'");
     $("#ticket_order").html("票号："+ ticketIdTransferd);
     if(ticket.needseat == 2 && ticket.status == 2){
@@ -126,12 +209,12 @@ function waitSeatSelection(){
     $("#noteMessage").css("display", "");
 
     $(".noteText").css('margin-top', ($('#noteMessage').height()-$('.noteText').height())/2+'px');
-  
+
     var widthCurrent = 0.4*width;
     $("#seatEntrance").css("display", "");
     $("#needButton").css("display", "");
     $("#ticket_ddl").css("display", "");
-    
+
 
     if (netWorkType == "network_type:wifi" && ticket.needseat == 1){
         $(".seatButton").attr("href", "/choosearea?ticketid="+ticket.id);
@@ -149,20 +232,20 @@ $("#eTicket").click(function(){
     $("#eTicket").attr("class", "active");
     $("#guideMap-zt").css("display", "none");
     $("#guideMap-xq").css("display", "none");
-
+    /*
     if(status > 3 || status < 1)
         status = 0;
     if(status < 2){
         $("#seatEntrance").css("display", "");
     }
-    
+    */
     $(".cz_order").css("display", "");
 });
 
 $("#mapGuide").click(function(){
     var w = ticket.seat.substring(0,1);
     if((w > 'E' || w < 'A') && ticket.status == 2){
-        alertInfo("系统24小时内为您分配座位。");    
+        alertInfo("系统24小时内为您分配座位。");
     }
 
     if(ticket.needseat == 1){
@@ -176,7 +259,8 @@ $("#mapGuide").click(function(){
     }
     $("#eTicket").attr("class", "");
     $("#mapGuide").attr("class", "active");
-    $("#seatEntrance").css("display", "none");
+    $("#seatEntrance").css("display", "");
+   // $("#seatEntrance").css("display", "none");
     $(".cz_order").css("display", "none");
 
     initMapZt();

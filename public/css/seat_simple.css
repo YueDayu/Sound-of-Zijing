@@ -1,4 +1,4 @@
-﻿body
+body
 {
 	background-color: rgb(30,35,41);
 	position: absolute;
@@ -13,6 +13,21 @@
 ul{
 	padding-left: 0px;
 	list-style-type:none;
+}
+
+img {
+	width: 1em;
+	-webkit-transition-property: width;
+	-webkit-transition-duration: .3s;
+}
+
+input{
+	background-color:transparent;
+	width: 2em;
+	border:0;
+	text-size:3em;
+	text-align:center;
+	color:rgb(170,170,170);
 }
 
 #simplePage{
@@ -59,12 +74,6 @@ ul{
 
 }
 
-
-
-#selectedSign{
-	background: #f0ee2d;
-}
-
 #fullSign1{
 	background-color: #F22121;
 }
@@ -89,7 +98,9 @@ ul{
 	white-space:nowrap; 
 	overflow:hidden; 
 	text-overflow:ellipsis;
+	word-break:normal;
 }
+
 
 #block_A a{
 	top:35%;
@@ -349,20 +360,47 @@ ul{
 	font-weight: lighter;
 	position: relative;
 }
+
+/************选择区域(支持多张票)************/
+#choose_Area{
+	width: 80%;
+	height: 8em;
+	margin-left: auto;
+	margin-right: auto;
+	font-size: 3em;
+	color: rgb(170,170,170);
+
+}
+
+#area_item{
+	width:10%;
+	float:left;
+}
+#choose{
+	width:90%;
+	float:right;
+}
+#area_item ul{
+	text-align: left;
+}
+#choose ul{
+	text-align:left;
+}
+
 /**********购票信息**************/
 #info_Area
 {
 	width: 80%;
-	height: 200px;
+	height: 7em;
 	margin-left: auto;
 	margin-right: auto;
 	font-size: .5em;
 	color: rgb(170,170,170);
-	margin-bottom: 20%;
+	margin-bottom: 10%;
 }
 
 #item, #info{
-	width: 50%;
+	width: 40%;
 }
 #item{
 	float: left;
@@ -378,7 +416,7 @@ ul{
 
 #item ul{
 	text-align: left;
-} 
+}
 
 /**********提示框样式*************/
 #alertFrame{

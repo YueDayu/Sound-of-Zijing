@@ -1,5 +1,5 @@
-/* 
-*	fonts are fromt fontello.com 
+/*
+*	fonts are fromt fontello.com
 *	author: Yanzhe Yang;
 * 	time:　	2014/12/8;
 */
@@ -24,14 +24,14 @@ body{
   font-style: normal;
   font-weight: normal;
   speak: none;
- 
+
   display: inline-block;
   text-decoration: inherit;
   width: 1em;
   margin-right: .2em;
   text-align: center;
   /* opacity: .8; */
- 
+
   /* For safety - reset parent styles, that can break glyph codes*/
   font-variant: normal;
   text-transform: none;
@@ -41,8 +41,8 @@ body{
 .icon-cart:before { content: '\e800'; }
 .icon-location:before { content: '\e802'; }
 .icon-right-thin:before { content: '\e803';}
-.icon-leaf:before { content: '\e804'; } 
-.icon-compass:before { content: '\e805'; } 
+.icon-leaf:before { content: '\e804'; }
+.icon-compass:before { content: '\e805'; }
 .icon-signal:before { content: '\e801'; }
 
 body{
@@ -85,7 +85,7 @@ body{
 #eTicket, #mapGuide{
 	width: 50%;
 	float: left;
-	
+
 	text-align: center;
 	font-size: .8em;
 }
@@ -126,11 +126,11 @@ dd .title{
 
 /******************* 二维码视图  *********************
 ******************************************************/
-.blur {    
+.blur {
     -webkit-filter: blur(1px); /* Chrome, Opera */
        -moz-filter: blur(1px);
-        -ms-filter: blur(1px);    
-            filter: blur(1px);    
+        -ms-filter: blur(1px);
+            filter: blur(1px);
 }
 
 
@@ -166,7 +166,7 @@ dd .title{
 	border-radius: 5px;
 	border-color: #004687;
 	border-width: 2px;
-	
+
 	font-size: 3em;
 	/*color: rgb(239, 228, 176);*/
 	/*color: rgb(255, 127, 39);*/
@@ -244,7 +244,7 @@ dd .title{
     z-index: 100;
 }
 
-#alertInfo{ 
+#alertInfo{
 	margin-top: 10px;
 	margin-bottom: 10px;
 	font-weight: bold;
@@ -289,8 +289,8 @@ dd .title{
 	font-weight: bold;
 	color: rgb(20, 20, 20);
 	opacity: 0.8;
-	white-space:nowrap; 
-	overflow:hidden; 
+	white-space:nowrap;
+	overflow:hidden;
 	text-overflow:ellipsis;
 }
 
@@ -484,4 +484,35 @@ dd .title{
 	color: #646565;
 	text-align: center;
 	line-height: 145%;
+}
+
+#display_qrcodeWrap_div{
+	text-align: center;
+	padding: 5% 5% 5% 5%;
+}
+
+#display_qrcodeWrap{
+	width: 90%;
+	height: auto;
+}
+
+.seatButton{
+	display: block;
+	width: 45%;
+	float: left;
+	margin-left: 2.5% !important;
+	margin-right: 2.5% !important;
+	text-align: center !important;
+}
+
+.no_refundButton{
+	display: block;
+	width: 45%;
+	float: left;
+	margin-left: 2.5% !important;
+	margin-right: 2.5% !important;
+	text-align: center !important;
+	background-color: rgb(100, 100, 100) !important;
+	color: rgb(200, 200, 200) !important;
+	text-indent: 0 !important;
 }
