@@ -312,8 +312,9 @@ exports.faire_list_ticket = function (msg, res) {
                 $or: [{status: 1}, {status: 2}]
             }, function (err, docs) {
                 for (var x in current_activity) {
-                    var activity = current_activity[x];
-                    if (activity.status >= 0) {
+                    var act = current_activity[x];
+                    if (act.status >= 0) {
+                        var activity = all_activity[act.activity_id];
                         if (!activity.user_map[stuID]) {
                             for (var y in activity.user_map[stuID].tickets) {
                                 docs.push(activity.user_map[stuID].tickets[y]);
