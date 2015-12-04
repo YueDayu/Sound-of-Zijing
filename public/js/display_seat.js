@@ -33,7 +33,7 @@ function display_seat() {
     div_area_arrange.append(div_label);
 
     var div_input = $("<div class='form-group area-input'></div>");
-    var input_temp = $("<input class='form-control' type='number' id='input-A_area' value='' min='0' step='1' area-part='a'>");
+    var input_temp = $("<input class='form-control' type='number' id='input-'+area_Char+'_area' value='' min='0' step='1' area-part='a'>");
     input_temp.attr("placeholder", area_Char+"区票数");
       div_input.append(input_temp);
     div_area_arrange.append(div_input);
