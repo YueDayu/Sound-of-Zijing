@@ -82,6 +82,8 @@ var activity_cache = function (activity_key, book_start, book_end) {
     this.book_end_timer = null;
     this.save_back_timer = null;
     this.save_file_timer = null;
+    this.book_start = 0;
+    this.book_end = 0;
 
     this.clear_timer = function () {
         if (this.pre_load_timer != null) {
@@ -120,10 +122,12 @@ var activity_cache = function (activity_key, book_start, book_end) {
             this.pre_load();
         }.bind(this), this.get_sched(moment(parseInt(book_start)).subtract(5, 'm')), this);
 
+        this.book_start = book_start;
         this.book_start_timer = later.setTimeout(function () {
             this.book_start_event();
         }.bind(this), this.get_sched(moment(parseInt(book_start))), this);
 
+        this.book_end = book_end;
         this.book_end_timer = later.setTimeout(function () {
             this.book_end_event();
         }.bind(this), this.get_sched(moment(parseInt(book_end))), this);
