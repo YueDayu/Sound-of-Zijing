@@ -18,7 +18,7 @@ var ACTIVITY_DB = model.activities;
 var SEAT_DB = model.seats;
 var TICKET_DB = model.tickets;
 
-var snapshot_path = "./snapshot/"
+var snapshot_path = "./snapshot/";
 
 later.date.localTime();
 
@@ -49,7 +49,7 @@ exports.all_activity = all_activity;
  may need load data from temp file.
  */
 var load_not_end_activity = function () {
-    var current_time = moment().valueOf();
+    var current_time = moment().substract(1, 'h').substract(5, 'h').valueOf();
     db[ACTIVITY_DB].find(
         {
             status: 1,
@@ -168,18 +168,12 @@ var activity_cache = function (activity_key, book_start, book_end) {
                             current_activity[this.activity_key].status = -1;
                             lock.release('cache' + this.activity_key);
                             this.restore_from_file();
-                            if ((new Date()).getTime() > this.activity_info.book_start) {
-                                this.book_start_event();
-                            }
                         }.bind(this));
                     } else { // finished
                         console.log('pre-load is finished! key: ' + this.activity_key);
                         current_activity[this.activity_key].status = -1;
                         lock.release('cache' + this.activity_key);
                         this.restore_from_file();
-                        if ((new Date()).getTime() > this.activity_info.book_start) {
-                            this.book_start_event();
-                        }
                     }
                 }.bind(this));
         }.bind(this));
@@ -191,6 +185,7 @@ var activity_cache = function (activity_key, book_start, book_end) {
             console.log(this.activity_key + ' started!');
             current_activity[this.activity_key].status = 0;
             lock.release('cache' + this.activity_key);
+            this.save_to_file();
             this.save_file_timer = later.setInterval(function() {
                 this.save_to_file();
             }.bind(this), later.parse.recur().every().hour(), this);
@@ -202,7 +197,8 @@ var activity_cache = function (activity_key, book_start, book_end) {
                 var data = JSON.stringify(
                     {'remain_tickets': this.activity_info.remain_tickets,
                      'user_map': this.user_map,
-                     'seat_map': this.seat_map
+                     'seat_map': this.seat_map,
+                     'status': current_activity[this.activity_key].status
                     });
                 lock.release('cache' + this.activity_key);
                 var filepath = snapshot_path + this.activity_info._id + '.tmp';
@@ -229,14 +225,29 @@ var activity_cache = function (activity_key, book_start, book_end) {
                         this.activity_info.remain_tickets = data['remain_tickets'];
                         this.user_map = data['user_map'];
                         this.seat_map = data['seat_map'];
+                        current_activity[this.activity_key].status = data['status'];
                     }
                     lock.release('cache' + this.activity_key);
+                    this.restore_events();
                 }.bind(this));
             } else {
                 lock.release('cache' + this.activity_key);
             }
         }.bind(this));
     };
+
+    this.restore_events = function () {
+        if (current_activity[this.activity_key].status == -1 && moment.parseInt(this.activity_info.book_start).isBefore()) {
+            this.book_start_event();
+        }
+        if (current_activity[this.activity_key].status == 0 && moment.parseInt(this.activity_info.book_end).isBefore()) {
+            this.book_end_event();
+        }
+        if (current_activity[this.activity_key].status == 1 && moment.parseInt(this.activity_info.book_end).add(1, 'h').isBefore()) {
+            this.save_to_db();
+        }
+    };
+
     // TODO: disable the time which saved files.
     this.book_end_event = function () {
         lock.acquire('cache' + this.activity_key, function () {
@@ -246,6 +257,7 @@ var activity_cache = function (activity_key, book_start, book_end) {
                 console.log('error on ending the activity. key: ' + this.activity_key);
             }
             lock.release('cache' + this.activity_key);
+            this.save_to_file();
         }.bind(this));
     };
     this.save_to_db = function () {
@@ -274,6 +286,7 @@ var activity_cache = function (activity_key, book_start, book_end) {
                         this.clear_activity();
                         all_activity[id] = null;
                         lock.release('cache' + this.activity_key);
+                        this.save_to_file();
                     }
                 }.bind(this));
             }
@@ -291,6 +304,7 @@ var activity_cache = function (activity_key, book_start, book_end) {
                     this.clear_activity();
                     all_activity[id] = null;
                     lock.release('cache' + this.activity_key);
+                    this.save_to_file();
                 }
             }.bind(this));
             for (var stu_index in this.user_map) {
@@ -304,6 +318,7 @@ var activity_cache = function (activity_key, book_start, book_end) {
                             this.clear_activity();
                             all_activity[id] = null;
                             lock.release('cache' + this.activity_key);
+                            this.save_to_file();
                         }
                     }.bind(this));
                 }
