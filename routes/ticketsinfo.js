@@ -120,34 +120,31 @@ router.get('/', function (req, res) {
             var tiSeat = ticket_info.seat;
 
             if (ticketstatus == 0 || ticketstatus == 99) {
-                res.render("alert",
-                    {
-                        errorinfo: "无效票。可能是已经退掉的票或是活动已结束而无效。",
-                        backadd: null
-                    });
+                res.render("alert", {
+                    errorinfo: "无效票。可能是已经退掉的票或是活动已结束而无效。",
+                    backadd: null
+                });
                 return;
             }
 
-            if (docs1[0].need_seat != 0 && tiSeat == "")
+            if (docs1[0].need_seat != 0 && tiSeat == "") {
                 ticket_status = 1;
-            else
+            } else {
                 ticket_status = 2;
-            if (ticketstatus == 3)
+            }
+            if (ticketstatus == 3) {
                 ticket_status = 3;
+            }
 
             if (tiSeat == "") {
-                var current = (new Date()).getTime();
-                if (ticket_status == 1 && (current < docs1[0].book_start || current > docs1[0].book_end)) {
+                if (ticket_status == 1 && act.status >= 2) {
                     ticket_status = 2;
                     tiSeat = "您未在抢票时间内选座，系统将稍后随机分配座位";
                 }
-                else {
-
-                }
-            }
-            else {
-                if (docs1[0].need_seat == 1)
+            } else {
+                if (docs1[0].need_seat == 1) {
                     tiSeat = tiSeat[0] + "区";
+                }
                 if (docs1[0].need_seat == 2) {
                     var tres = translateSeatNum(tiSeat[0], tiSeat.substr(1));
                     if (tres.c < 10) tres.c = "0" + tres.c;
@@ -185,8 +182,7 @@ router.get('/', function (req, res) {
                 db[activities].find({_id: activityid}, function (err, docs1) {
                     if (docs1.length == 0) {
                         res.send("您的票所对应的活动不存在！");
-                    }
-                    else {
+                    } else {
                         var activityName = docs1[0].name;
                         var activityPhoto = docs1[0].pic_url;
                         var activityPlace = docs1[0].place;
@@ -199,29 +195,27 @@ router.get('/', function (req, res) {
                         var ticket_status;
 
                         if (ticketstatus == 0 || ticketstatus == 99) {
-                            res.render("alert",
-                                {
-                                    errorinfo: "无效票。可能是已经退掉的票或是活动已结束而无效。",
-                                    backadd: null
-                                });
+                            res.render("alert", {
+                                errorinfo: "无效票。可能是已经退掉的票或是活动已结束而无效。",
+                                backadd: null
+                            });
                             return;
                         }
 
-                        if (docs1[0].need_seat != 0 && tiSeat == "")
+                        if (docs1[0].need_seat != 0 && tiSeat == "") {
                             ticket_status = 1;
-                        else
+                        } else {
                             ticket_status = 2;
-                        if (ticketstatus == 3)
+                        }
+                        if (ticketstatus == 3) {
                             ticket_status = 3;
+                        }
 
                         if (tiSeat == "") {
                             var current = (new Date()).getTime();
                             if (ticket_status == 1 && (current < docs1[0].book_start || current > docs1[0].book_end)) {
                                 ticket_status = 2;
                                 tiSeat = "您未在抢票时间内选座，系统将稍后随机分配座位";
-                            }
-                            else {
-
                             }
                         }
                         else {
