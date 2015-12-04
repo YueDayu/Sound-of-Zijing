@@ -291,7 +291,7 @@ router.post("/", function (req, res) {
             activity.seat_map[realName] -= 1;
             ticket.seat = realName;
             lock.release('cache' + activity.activity_key);
-            res.redirect(urls.ticketInfo + "?ticketid=" + ticketID);
+            res.redirect(urls.ticketInfo + "?ticketid=" + ticketID + "&actid=" + activityID + "&stuid=" + stuID + "&err=1");
         });
 
 

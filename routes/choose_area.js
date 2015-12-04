@@ -18,12 +18,8 @@ function checkValidity(req, res, callback) {
         res.send("ticketid is required!");
         return;
     }
-    if (req.query.ticketid == null) {
-        res.send("ticketid is required!");
-        return;
-    }
-    if (req.query.activityid == null) {
-        res.send("activityid is required!");
+    if (req.query.actid == null) {
+        res.send("actid is required!");
         return;
     }
     if (req.query.stuid == null) {
@@ -249,7 +245,7 @@ router.post("/", function (req, res) {
             seat_map[realName] -= 1;
             ticket.seat = realName;
             lock.release('cache' + activity.activity_key);
-            res.redirect(urls.ticketInfo + "?ticketid=" + ticketID);
+            res.redirect(urls.ticketInfo +"?ticketid=" + ticketID + "&actid=" + activityID + "&stuid=" + stuID + "&err=1");
         });
 
 /*        db[SEAT_DB].update(toFind, {$inc: toModify}, {multi: false}, function (err, result) {
