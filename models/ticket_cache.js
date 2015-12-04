@@ -204,13 +204,13 @@ var activity_cache = function (activity_key, book_start, book_end) {
                      'user_map': this.user_map,
                      'seat_map': this.seat_map
                     });
+                lock.release('cache' + this.activity_key);
                 var filepath = snapshot_path + this.activity_info._id + '.tmp';
                 fs.writeFile(filepath, data, function(err) {
                     if (err) {
                         //TODO handle bad saved files
-                        console.log('Error saving snapshot. key=' + this.activity_key)
+                        console.log('Error saving snapshot. key=' + this.activity_key);
                     }
-                    lock.release('cache' + this.activity_key);
                 }.bind(this));
             } else {
                 lock.release('cache' + this.activity_key);
