@@ -31,19 +31,35 @@ window.onload = function(){
 
 }
 
+$("#display_qrcodeWrap_div").click(function(){
+  $("#display_qrcodeWrap_div").css('display', 'none');
+  $("#qrcodeWrap").css('display', '');
+})
+
+$("#qrcode").click(function(){
+  $("#display_qrcodeWrap_div").css('display', '');
+  $("#qrcodeWrap").css('display', 'none');
+})
+
 function displayButton(){
-    console.log(needseat);
-    console.log(validrefund);
-    if(needseat == 0){      //不需要选座,只有退票按钮
-        if(validrefund== 1){
+    console.log(ticket.needseat);
+    console.log(ticket.validrefund);
+      if (ticket.status > 1){
+    ticket.needseat = 0;
+    }
+    if(ticket.needseat == 0){      //不需要选座,只有退票按钮
+        if(ticket.validrefund== 1){
             $('.refundButton').css('width','95%');
             $('.refundButton').css('display','block');
             $('.refundButton').attr("href", "javascript:refundConfirm()");
-
+        }else{
+            $('.no_refundButton').css('width','95%');
+            $('.no_refundButton').css('display','block');
+            $('.no_refundButton').attr("href", "javascript:refundConfirm()");
         }
     }
     else{               //需要选座
-        if(validrefund == 1) {   //可以退票
+        if(ticket.validrefund == 1) {   //可以退票
             $('.refundButton,.seatButton').css('width', '45%');
             $('.refundButton,.seatButton').css('display', 'block');
             $('.refundButton,.seatButton').css('display', 'block');
@@ -52,12 +68,17 @@ function displayButton(){
             $('.refundButton').attr("href", "javascript:refundConfirm()");
         }
         else{
-            $('.seatButton').css('width','95%');
-            $('.seatButton').css('display','block');
+          $('.no_refundButton,.seatButton').css('width', '45%');
+          $('.no_refundButton,.seatButton').css('display', 'block');
+          $('.no_refundButton,.seatButton').css('display', 'block');
+          $('.no_refundButton,.seatButton').css('float', 'left');
+          $('.no_refundButton,.seatButton').css('margin-left', '10px');
+          $('.no_refundButton').attr("href", "javascript:refundConfirm()");
         }
 
     }
 }
+
 function refundConfirm(){
     var info = "您确定要退票吗?<br><br><btn id = 'confirm_rfd_btn'>确认</btn>"+
         "&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp" +
@@ -82,7 +103,7 @@ function refundConfirm(){
 
 function isIE(){
     var a1 = navigator.userAgent;
-    var yesIE = a1.search(/Trident/i); 
+    var yesIE = a1.search(/Trident/i);
     if(yesIE > 0){
         return true;
     }
@@ -90,7 +111,7 @@ function isIE(){
         return false;
     }
 
-}  
+}
 
 function transferTicketId(){
     var str = ticket.id.substring(0,12);
@@ -157,7 +178,7 @@ function setValue(){
     var status = ticket.status;
     if(status > 3 || status < 1)
         status = 0;
-    
+
     if(ticket.needseat == 2 && ticket.status == 2 && !ticket.isPaid){
         $("#ticket_status").html("等待支付");
     }
@@ -173,7 +194,7 @@ function setValue(){
     $("#ticket_ddl").html("选座截止时间： "+ticket.seatddl);
     $("#ticket_seat").html("座位："+seat);
     $("#ticket_place").html("场馆："+ticket.place);
-    
+
     $("#ticket_cancel").html("退票方式：回复 '退票 "+ ticket.name + "'");
     $("#ticket_order").html("票号："+ ticketIdTransferd);
     if(ticket.needseat == 2 && ticket.status == 2){
@@ -188,12 +209,12 @@ function waitSeatSelection(){
     $("#noteMessage").css("display", "");
 
     $(".noteText").css('margin-top', ($('#noteMessage').height()-$('.noteText').height())/2+'px');
-  
+
     var widthCurrent = 0.4*width;
     $("#seatEntrance").css("display", "");
     $("#needButton").css("display", "");
     $("#ticket_ddl").css("display", "");
-    
+
 
     if (netWorkType == "network_type:wifi" && ticket.needseat == 1){
         $(".seatButton").attr("href", "/choosearea?ticketid="+ticket.id);
@@ -224,7 +245,7 @@ $("#eTicket").click(function(){
 $("#mapGuide").click(function(){
     var w = ticket.seat.substring(0,1);
     if((w > 'E' || w < 'A') && ticket.status == 2){
-        alertInfo("系统24小时内为您分配座位。");    
+        alertInfo("系统24小时内为您分配座位。");
     }
 
     if(ticket.needseat == 1){
