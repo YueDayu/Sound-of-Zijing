@@ -61,10 +61,10 @@ var load_not_end_activity = function () {
             }
             for (idx in docs) {
                 var doc = docs[idx];
-                all_activity[doc.key] = new activity_cache(doc.key, doc.book_start, doc.book_end);
+                all_activity[doc._id] = new activity_cache(doc.key, doc.book_start, doc.book_end);
                 if (moment(parseInt(doc.book_start)).subtract(5, 'm').isBefore())
                 {
-                    all_activity[doc.key].pre_load();
+                    all_activity[doc._id].pre_load();
                 }
             }
         });
