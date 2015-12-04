@@ -36,25 +36,48 @@ function displayButton(){
     console.log(validrefund);
     if(needseat == 0){      //不需要选座,只有退票按钮
         if(validrefund== 1){
-            $(".refundButton").css('width','95%');
+            $('.refundButton').css('width','95%');
             $('.refundButton').css('display','block');
+            $('.refundButton').attr("href", "javascript:refundConfirm()");
 
         }
     }
     else{               //需要选座
         if(validrefund == 1) {   //可以退票
-            $(".refundButton,.seatButton").css('width', '45%');
-            $(".refundButton,.seatButton").css('display', 'block');
-            $(".refundButton,.seatButton").css('display', 'block');
-            $(".refundButton,.seatButton").css('float', 'left');
-            $(".refundButton,.seatButton").css('margin-left', '10px');
+            $('.refundButton,.seatButton').css('width', '45%');
+            $('.refundButton,.seatButton').css('display', 'block');
+            $('.refundButton,.seatButton').css('display', 'block');
+            $('.refundButton,.seatButton').css('float', 'left');
+            $('.refundButton,.seatButton').css('margin-left', '10px');
+            $('.refundButton').attr("href", "javascript:refundConfirm()");
         }
         else{
-            $(".seatButton").css('width','95%');
+            $('.seatButton').css('width','95%');
             $('.seatButton').css('display','block');
         }
 
     }
+}
+function refundConfirm(){
+    var info = "您确定要退票吗?<br><br><btn id = 'confirm_rfd_btn'>确认</btn>"+
+        "&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp" +
+            "<btn id = 'cancel_rfd_btn'>取消</btn>";
+
+    $("#alertInfo").html(info);
+    $("#alertFrame").css("display", "inherit");
+    $("#alertFrame").animate({
+        top: '50%',
+        opacity: '.9',
+    }, 500, function(){
+
+    });
+    $('#confirm_rfd_btn').click(function(){
+        //把退票信息传给服务器
+
+    });
+    $('#cancel_rfd_btn').click(function(){
+        $("#alertFrame").css("display", "none");
+    });
 }
 
 function isIE(){
