@@ -93,14 +93,15 @@ function generateUniqueCode(stu_id, act_id, tic_index) {
     return res;
 }
 
-function presentTicket(msg, res, user_tickets, act) {
+function presentTicket(msg, res, stuID, act) {
+    var user_tickets = act.user_map[stuID];
     var tmp = "恭喜，抢票成功！您现在有" + user_tickets.num + "张票:\n";
     var i = 1;
     for (var x in user_tickets.tickets) {
         tmp += template.getHyperLink("点我查看第" + i + "张电子票", urls.ticketInfo + "?ticketid="
-            + user_tickets.tickets[x].unique_id);
+            + user_tickets.tickets[x].unique_id + "&stuid=" + stuID + "&actid=" + act.activity_info._id);
     }
-    if (act.need_seat != 0)
+    if (act.activity_info.need_seat != 0)
         tmp += "\n注意:选座（区）将在抢票结束一小时之后截止，请尽快前往电子票选座。";
     res.send(template.getPlainTextTemplate(msg, tmp));
 }
@@ -212,7 +213,7 @@ exports.faire_get_ticket = function (msg, res) {
                         cost: (staticACT.need_seat == 2 ? parseInt(staticACT.price) : 0)
                     };
                 }
-                presentTicket(msg, res, staticACT.user_map[stuID], staticACT);
+                presentTicket(msg, res, stuID, staticACT);
                 usr_lock[stuID] = null;
                 lock.release('cache' + staticACT.activity_info.key);
             });
@@ -296,7 +297,8 @@ function renderTicketList(oneTicket, oneActivity, isSingle) {
     } else {
         ret[template.rich_attr.title] = oneActivity.name;
     }
-    ret[template.rich_attr.url] = urls.ticketInfo + "?ticketid=" + oneTicket.unique_id;
+    ret[template.rich_attr.url] = urls.ticketInfo + "?ticketid=" + oneTicket.unique_id
+        + "&stuid=" + oneTicket.stu_id + "&actid=" + oneActivity._id;
     ret[template.rich_attr.picture] = oneActivity.pic_url;
     return ret;
 }
