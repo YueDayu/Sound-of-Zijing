@@ -3,6 +3,8 @@ var router = express.Router();
 
 var model = require('../models/models');
 var urls = require("../address_configure");
+var ticket_cache = require('../models/ticket_cache');
+var lock = require('../models/lock');
 
 var TICKET_DB = model.tickets;
 var ACTIVITY_DB = model.activities;
@@ -62,7 +64,81 @@ function checkValidity(req, res, callback) {
         res.send("ticketid is required!");
         return;
     }
-    db[TICKET_DB].find({unique_id: req.query.ticketid, status: {$ne: 0}}, function (err, docs) {
+    if (req.query.activityid == null) {
+        res.send("activityid is required!");
+        return;
+    }
+    if (req.query.stuid == null) {
+        res.send("stuid is required!");
+        return;
+    }
+
+    var activityid = req.query.activityid;
+    var ticketid = req.query.ticketid;
+    var stuid = req.query.stuid;
+
+    var all_activity = ticket_cache.all_activity;
+    var current_activity = ticket_cache.current_activity;
+
+    if (all_activity[activityid] == undefined || all_activity[activityid] == null) {
+        res.render("alert",
+        {
+            errorinfo: "activity not found or has expired",
+            backadd: urls.ticketInfo + "?ticketid=" + ticketid
+        });
+        return;
+    }
+
+    var activity = all_activity[activityid];
+    if (current_activity[activity.activity_key] == undefined || current_activity[activity.activity_key] == null) {
+        res.render("alert",
+        {
+            errorinfo: "activity has expired",
+            backadd: urls.ticketInfo + "?ticketid=" + ticketid
+        });
+        return;
+    }
+    if (current_activity[activity.activity_key].status < 0 || current_activity[activity.activity_key].status == 2) {
+        res.render("alert",
+        {
+            errorinfo: "you cannot choose seat at this time",
+            backadd: urls.ticketInfo + "?ticketid=" + ticketid
+        });
+        return;
+    }
+    if (all_activity[activityid].user_map[stuid] == undefined) {
+        res.send("stuid invalid");
+        return;
+    }
+    if (all_activity[activityid].user_map[stuid].tickets[ticketid] == undefined) {
+        res.send("ticketid invalid");
+        return;
+    }
+
+    var ticket = all_activity[activityid].user_map[stuid].tickets[ticketid];
+    if (ticket.seat != "") {
+        var tres = translateSeatNum(ticket.seat[0], ticket.seat.substr(1));
+        if (tres.c < 10) tres.c = "0" + tres.c;
+        res.render("alert",
+            {
+                errorinfo: "已经选过座位啦！座位是" + tres.r + "排" + tres.c + "座",
+                backadd: urls.ticketInfo + "?ticketid=" + ticketid
+            });
+        return;
+    }
+    if (activity.activity_info.need_seat != 2) {
+        res.render("alert",
+            {
+                errorinfo: "no need to choose seat",
+                backadd: urls.ticketInfo + "?ticketid=" + ticketid
+            });
+        return;
+    }
+    callback(ticketid, activityid, stuid);
+
+
+
+/*    db[TICKET_DB].find({unique_id: req.query.ticketid, status: {$ne: 0}}, function (err, docs) {
         if (docs.length == 0) {
             res.send("No such a ticket.");
         }
@@ -105,7 +181,7 @@ function checkValidity(req, res, callback) {
                 }
             });
         }
-    });
+    });*/
 }
 
 function addZero(num) {
@@ -125,8 +201,40 @@ function getTime(datet, isSecond) {
         + (isSecond === true ? ":" + datet.getSeconds() : "");
 }
 router.get("/", function (req, res) {
-    checkValidity(req, res, function (ticketID, activityID, bookend) {
-        db[SEAT_DB].find({activity: activityID}, function (err, docs) {
+    checkValidity(req, res, function (ticketID, activityID, stuID) {
+        var activity = ticket_cache.all_activity[activityID];
+        var seat_data = activity.seat_map;
+
+        var seatMap = {}, line, row;
+        for (var i in seat_data) {
+            if (i != "_id" && i != "activity" && i.length >= 2) {
+                line = i[0] + "";
+                row = i.substr(1);
+                if (seatMap[line] == null)
+                    seatMap[line] = [];
+                if (seat_data[i] > 0)
+                    seatMap[line].push(parseInt(row));
+            }
+        }
+        var seatMap2 = [];
+        var alpha = "ABCDEFGH";
+        for (var i = 0; i < 8; i++) {
+            if (seatMap[alpha[i]] == null)
+                seatMap2[i] = [];
+            else
+                seatMap2[i] = seatMap[alpha[i]];
+        }
+
+        var inf =
+        {
+            tid: ticketID,
+            bookddl: getTime(activity.book_end),
+            seatMap: JSON.stringify(seatMap2),
+            errorid: errorid
+        };
+
+        res.render("seat_litang", inf);
+/*        db[SEAT_DB].find({activity: activityID}, function (err, docs) {
             if (err || docs.length == 0) {
                 res.send("Error.");
                 return;
@@ -162,19 +270,32 @@ router.get("/", function (req, res) {
             };
 
             res.render("seat_litang", inf);
-        });
+        });*/
     });
 });
 
 router.post("/", function (req, res) {
-    checkValidity(req, res, function (ticketID, activityID, bookend) {
-        var toFind = {activity: activityID};
+    checkValidity(req, res, function (ticketID, activityID, stuID) {
         var realName = req.body.seat;
-        toFind[realName] = {$gt: 0};
-        var toModify = {};
-        toModify[realName] = -1;
         console.log(realName);
-        db[SEAT_DB].update(toFind, {$inc: toModify}, {multi: false}, function (err, result) {
+
+        var activity = ticket_cache.all_activity[activityID];
+        var ticket = activity.user_map[stuID].tickets[ticketID];
+
+        if (activity.seat_map[realName] <= 0) {
+            res.redirect(urls.chooseseat + "?ticketid=" + ticketID + "&err=1");
+            return 0;
+        }
+
+        lock.acquire('cache' + activity.activity_key, function() {
+            activity.seat_map[realName] -= 1;
+            ticket.seat = realName;
+            lock.release('cache' + activity.activity_key);
+            res.redirect(urls.ticketInfo + "?ticketid=" + ticketID);
+        });
+
+
+/*        db[SEAT_DB].update(toFind, {$inc: toModify}, {multi: false}, function (err, result) {
             if (err || result.n == 0) {
                 //WARNING!
                 res.redirect(urls.chooseseat + "?ticketid=" + ticketID + "&err=1");
@@ -194,7 +315,7 @@ router.post("/", function (req, res) {
                     }
                     res.redirect(urls.ticketInfo + "?ticketid=" + ticketID);
                 });
-        });
+        });*/
     });
 });
 
