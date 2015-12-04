@@ -64,8 +64,8 @@ function checkValidity(req, res, callback) {
         res.send("ticketid is required!");
         return;
     }
-    if (req.query.activityid == null) {
-        res.send("activityid is required!");
+    if (req.query.actid == null) {
+        res.send("actid is required!");
         return;
     }
     if (req.query.stuid == null) {
@@ -283,7 +283,7 @@ router.post("/", function (req, res) {
         var ticket = activity.user_map[stuID].tickets[ticketID];
 
         if (activity.seat_map[realName] <= 0) {
-            res.redirect(urls.chooseseat + "?ticketid=" + ticketID + "&err=1");
+            res.redirect(urls.chooseseat + "?ticketid=" + ticketID + "&actid=" + activityID + "&stuid=" + stuID + "&err=1");
             return 0;
         }
 
@@ -291,7 +291,7 @@ router.post("/", function (req, res) {
             activity.seat_map[realName] -= 1;
             ticket.seat = realName;
             lock.release('cache' + activity.activity_key);
-            res.redirect(urls.ticketInfo + "?ticketid=" + ticketID);
+            res.redirect(urls.ticketInfo + "?ticketid=" + ticketID + "&actid=" + activityID + "&stuid=" + stuID + "&err=1");
         });
 
 
