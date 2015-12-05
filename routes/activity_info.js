@@ -36,7 +36,10 @@ router.get("/", function (req, res, next) {
     //WARNING: 500 when invalid id
     var theActID = model.getIDClass(req.query.actid);
 
-    if (all_activity[theActID] != null) { // if in the cache.
+    console.log(current_activity);
+
+    if (current_activity[all_activity[theActID].activity_key] != null) { // if in the cache.
+        console.log(current_activity);
         var theAct = all_activity[theActID].activity_info;
         var nowStatus = 0;
         var current = (new Date()).getTime();
