@@ -21,6 +21,55 @@ var alphabet = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM0123456789_-
 
 var usr_lock = {};
 
+function translateSeatNum(row, col) {
+    var total;
+    var result = {};
+    switch (row) {
+        case "A":
+            result.r = 1;
+            total = 33;
+            break;
+        case "B":
+            result.r = 2;
+            total = 35;
+            break;
+        case "C":
+            result.r = 3;
+            total = 37;
+            break;
+        case "D":
+            result.r = 4;
+            total = 39;
+            break;
+        case "E":
+            result.r = 5;
+            total = 41;
+            break;
+        case "F":
+            result.r = 6;
+            total = 41;
+            break;
+        case "G":
+            result.r = 7;
+            total = 41;
+            break;
+        case "H":
+            result.r = 8;
+            total = 41;
+            break;
+        default:
+            result.r = -1;
+            result.c = -1;
+            return result;
+    }
+
+    result.c = total - parseInt(col) * 2;
+    if (result.c < 0)
+        result.c = -result.c + 1;
+
+    return result;
+}
+
 function verifyStudent(openID, ifFail, ifSucc) {
     redis_db.get(USER_DB + '_' + openID, function (err, res) {
         if (err || !res) {
@@ -118,7 +167,16 @@ function presentTicket(msg, res, stuID, act) {
         }
         var seat_info = "(未选座)";
         if (user_tickets.tickets[x].seat && user_tickets.tickets[x].seat != "") {
-            seat_info = "(座位为" + user_tickets.tickets[x].seat + ")"
+            var seat = "";
+            if (act.activity_info.need_seat == 1) {
+                seat = user_tickets.tickets[x].seat[0] + "区";
+            }
+            if (act.activity_info.need_seat == 2) {
+                var tres = translateSeatNum(user_tickets.tickets[x].seat[0], user_tickets.tickets[x].seat.substr(1));
+                if (tres.c < 10) tres.c = "0" + tres.c;
+                seat = tres.r + "排" + tres.c + "座";
+            }
+            seat_info = "(座位为" + seat + ")"
         }
         tmp += template.getHyperLink("点我查看第" + i + "张电子票" + seat_info, urls.ticketInfo + "?ticketid="
             + user_tickets.tickets[x].unique_id + "&stuid=" + stuID + "&actid=" + act.activity_info._id);
@@ -171,6 +229,7 @@ exports.faire_get_ticket = function (msg, res) {
         actName = msg.EventKey[0].substr(basicInfo.WEIXIN_BOOK_HEADER.length);
     }
 
+    actName = actName.trim();
     var part = actName.split(" ");
     actName = part[0];
     var ticket_num = 1;
