@@ -65,6 +65,7 @@ router.get("/", function (req, res, next) {
                     .replace(/>/g, "&gt;")
                     .replace(/\\n/g, "<br>"),
                 seat_type: theAct.need_seat,
+                max_tickets: theAct.max_tickets,
 
                 cur_time: getTime(new Date(), true),
                 rem_tik: theAct.remain_tickets,
