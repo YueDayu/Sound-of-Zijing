@@ -19,6 +19,7 @@
 			<div id = "fullSign1" class = "signIcon"></div>
 			<div id = "fullInfo">已满&nbsp&nbsp</div>
 			<div id = "selectedSign" class = "signIcon"></div>
+			<div id = "selectedInfo">已选&nbsp&nbsp</div>
 		</div>
 		<div id = "Zongti">
 			<div id = "block_A">
@@ -34,7 +35,6 @@
 				<div id = "area_B2"></div>
 				<div id = "area_B3"></div>
 				<a>B区(12)</a>
-
 			</div>
 			<div id = "block_C">
 				<div id = "area_C1"></div>
@@ -58,39 +58,21 @@
 			</div>
 		</div>
 
-		<div id = "choose_Area">
-			<div id ="area_item">
-				<ul>
-					<li>A区</li>
-					<li>B区</li>
-					<li>C区</li>
-					<li>D区</li>
-					<li>E区</li>
-				</ul>
-			</div>
-			<div id ="choose">
-				<ul>
-					<li id = "A_choose" value="0"><a id="plus_a"><img src="img/plus.png"></a><input id="choose_a" value="0" readonly="false"><a id="minus_a"><img src="img/minus.png"></a>张</li>
-					<li id = "B_choose" value="0"><a id="plus_b"><img src="img/plus.png"></a><input id="choose_b" value="0" readonly="false"><a id="minus_b"><img src="img/minus.png"></a>张</li>
-					<li id = "C_choose" value="0"><a id="plus_c"><img src="img/plus.png"></a><input id="choose_c" value="0" readonly="false"><a id="minus_c"><img src="img/minus.png"></a>张</li>
-					<li id = "D_choose" value="0"><a id="plus_d"><img src="img/plus.png"></a><input id="choose_d" value="0" readonly="false"><a id="minus_d"><img src="img/minus.png"></a>张</li>
-					<li id = "E_choose" value="0"><a id="plus_e"><img src="img/plus.png"></a><input id="choose_e" value="0" readonly="false"><a id="minus_e"><img src="img/minus.png"></a>张</li>
-				</ul>
-			</div>
-		</div>
-
 		<div id = "info_Area">
 			<div id = "item">
 				<ul>
 					<li>选座截止时间：</li>
 					<li>当前活动状态：</li>
-
+					<li>您已选择的座位为：</li>
+					<li>该区还剩票数：</li>
 				</ul>
 			</div>
 			<div id = "info">
 				<ul>
 					<li id = "book_time"></li>
 					<li id = "ticket_state">可选座/可订票</li>
+					<li id = "seat_info">无</li>
+					<li id = "avaiNumber">—</li>
 				</ul>
 			</div>
 		</div>
@@ -127,7 +109,6 @@
 		ticketLeft.C = <%= CrestTicket %>;
 		ticketLeft.D = <%= DrestTicket %>;
 		ticketLeft.E = <%= ErestTicket %>;
-		var maxtickets = <%= maxTicket %>;
 		var stateCode = <%= errorid %>;
 	</script>
 	<script src="/js/floor_simple_css.js" type="text/javascript" charset="utf-8" defer></script>

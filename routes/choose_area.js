@@ -34,9 +34,6 @@ function checkValidity(req, res, callback) {
     var all_activity = ticket_cache.all_activity;
     var current_activity = ticket_cache.current_activity;
 
-    console.log(all_activity);
-    console.log(activityid);
-    console.log(all_activity[activityid]);
     if (all_activity[activityid] == null) {
         res.render("alert",
         {
@@ -78,7 +75,7 @@ function checkValidity(req, res, callback) {
         if (tres.c < 10) tres.c = "0" + tres.c;
         res.render("alert",
             {
-                errorinfo: "已经选过座位啦！座位是" + tres.r + "排" + tres.c + "座",
+                errorinfo: "已经选过座位啦！座位是" + ticket.seat,
                 backadd: urls.ticketInfo + "?ticketid=" + ticketid
             });
         return;
@@ -183,7 +180,6 @@ router.get("/", function (req, res) {
         var inf =
         {
             tid: ticketID,
-            maxTicket: activity.activity_info.max_tickets,
             bookddl: getTime(activity.book_end),
             ArestTicket: (seat_map["A_area"] == null ? 0 : seat_map["A_area"]),
             BrestTicket: (seat_map["B_area"] == null ? 0 : seat_map["B_area"]),
@@ -234,7 +230,6 @@ router.post("/", function (req, res) {
         console.log(req.body);
 
         var realName = req.body.seat[0] + "_area";
-        console.log(req.body);
 
         var activity = ticket_cache.all_activity[activityID];
         var ticket = activity.user_map[stuID].tickets[ticketID];

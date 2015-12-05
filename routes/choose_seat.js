@@ -73,7 +73,7 @@ function checkValidity(req, res, callback) {
         return;
     }
 
-    var activityid = req.query.activityid;
+    var activityid = req.query.actid;
     var ticketid = req.query.ticketid;
     var stuid = req.query.stuid;
 
@@ -204,6 +204,10 @@ router.get("/", function (req, res) {
     checkValidity(req, res, function (ticketID, activityID, stuID) {
         var activity = ticket_cache.all_activity[activityID];
         var seat_data = activity.seat_map;
+
+        var errorid = 100;
+        if (req.query.err != null)
+            errorid = 1;
 
         var seatMap = {}, line, row;
         for (var i in seat_data) {
