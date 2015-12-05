@@ -207,7 +207,7 @@ exports.faire_get_ticket = function (msg, res) {
                 };
                 user_info = staticACT.user_map[stuID];
             }
-            if (user_info.num + ticket_num >= staticACT.activity_info.max_tickets) {
+            if (user_info.num + ticket_num > staticACT.activity_info.max_tickets) {
                 res.send(template.getPlainTextTemplate(msg,
                     "你已经有" + user_info.num + "张票啦，每个人最多" + staticACT.activity_info.max_tickets
                     + "张票哦，再抢会炸的！"));
