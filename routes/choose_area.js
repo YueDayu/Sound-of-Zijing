@@ -27,13 +27,16 @@ function checkValidity(req, res, callback) {
         return;
     }
 
-    var activityid = req.query.activityid;
+    var activityid = req.query.actid;
     var ticketid = req.query.ticketid;
     var stuid = req.query.stuid;
 
     var all_activity = ticket_cache.all_activity;
     var current_activity = ticket_cache.current_activity;
 
+    console.log(all_activity);
+    console.log(activityid);
+    console.log(all_activity[activityid]);
     if (all_activity[activityid] == null) {
         res.render("alert",
         {
@@ -180,6 +183,7 @@ router.get("/", function (req, res) {
         var inf =
         {
             tid: ticketID,
+            maxTicket: activity.activity_info.max_ticket,
             bookddl: getTime(activity.book_end),
             ArestTicket: (seat_map["A_area"] == null ? 0 : seat_map["A_area"]),
             BrestTicket: (seat_map["B_area"] == null ? 0 : seat_map["B_area"]),
@@ -188,12 +192,13 @@ router.get("/", function (req, res) {
             ErestTicket: (seat_map["E_area"] == null ? 0 : seat_map["E_area"]),
             errorid: errorid
         };
-        if (req.query.simple != null) {
+/*        if (req.query.simple != null) {
             res.render("seat_simple", inf);
         }
         else {
             res.render("seat", inf);
-        }
+        }*/
+        res.render("seat_simple", inf);
         /*chooser_lock[req.query.ticketid] = null;
         db[SEAT_DB].find({activity: activityID}, function (err, docs) {
             if (err || docs.length == 0) {
