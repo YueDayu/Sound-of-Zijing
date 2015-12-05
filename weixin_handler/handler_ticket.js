@@ -19,14 +19,7 @@ var redis_db = model.redis_db;
 
 var alphabet = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM0123456789_-()!@$^*";
 
-//var act_cache = {};
-//var rem_cache = {};
-//var tik_cache = {};
 var usr_lock = {};
-
-//exports.clearCache = function () {
-//    act_cache = {};
-//};
 
 function verifyStudent(openID, ifFail, ifSucc) {
     redis_db.get(USER_DB + '_' + openID, function (err, res) {
@@ -50,6 +43,7 @@ exports.encode_refund_id = function(activity_key, ticket_id) {
 };
 
 function decode_refund_id(refund_id) {
+    refund_id = refund_id.trim();
     refund_id += " end";
     var part = refund_id.split(" ", 2);
     return {
@@ -119,6 +113,9 @@ function presentTicket(msg, res, stuID, act) {
     var tmp = "恭喜，抢票成功！您现在有" + user_tickets.num + "张票:\n";
     var i = 1;
     for (var x in user_tickets.tickets) {
+        if (!user_tickets.tickets[x]) {
+            continue;
+        }
         tmp += template.getHyperLink("点我查看第" + i + "张电子票", urls.ticketInfo + "?ticketid="
             + user_tickets.tickets[x].unique_id + "&stuid=" + stuID + "&actid=" + act.activity_info._id);
         i++;
@@ -256,13 +253,14 @@ exports.faire_reinburse_ticket = function (msg, res) {
     var openID = msg.FromUserName[0];
     var refund_id = "";
     if (msg.Content[0] === "退票") {
-        res.send(template.getPlainTextTemplate(msg, "请使用“退票 活动代称”的命令完成指定活动的退票。"));
+        res.send(template.getPlainTextTemplate(msg, "请使用“退票 活动代称 代码”的命令完成指定活动的退票。"));
         return;
     } else {
         refund_id = msg.Content[0].substr(3);
     }
 
     var refund_info = decode_refund_id(refund_id);
+    console.log(refund_info);
 
     verifyStudent(openID, function() {
         res.send(needValidateMsg(msg));
@@ -292,7 +290,7 @@ exports.faire_reinburse_ticket = function (msg, res) {
                     act.seat_map[ticket.seat]++;
                 }
                 act.activity_info.remain_tickets++;
-                stu_tickets.tickets[refund_info.ticket_id] = null;
+                delete stu_tickets.tickets[refund_info.ticket_id];
                 stu_tickets.num--;
                 res.send(template.getPlainTextTemplate(msg, "退票成功。"));
                 lock.release('cache' + act.activity_info.key);

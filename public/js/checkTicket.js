@@ -95,7 +95,7 @@ function refundConfirm() {
     $('#confirm_rfd_btn').click(function () {
         //把退票信息传给服务器
         var refund_info = "以下文字已经复制到剪贴板，请回到微信公众号页面粘贴并发送，即可退票。若未能成功复制，请手动复制粘贴。" +
-            "<br><br><input id='input_refund_info' value = '退票 " + ticket.name + " " + ticket.refund_id + "'>";
+            "<br><br><input id='input_refund_info' value = '退票 " + " " + ticket.refund_id + "'>";
         $("#alertInfo").html(refund_info);
         $("#alertInfo").css("padding", "5%");
         $("#alertInfo").css("line-height", "130%");
