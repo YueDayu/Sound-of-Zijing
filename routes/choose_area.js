@@ -183,7 +183,7 @@ router.get("/", function (req, res) {
         var inf =
         {
             tid: ticketID,
-            maxTicket: activity.activity_info.max_ticket,
+            maxTicket: activity.activity_info.max_tickets,
             bookddl: getTime(activity.book_end),
             ArestTicket: (seat_map["A_area"] == null ? 0 : seat_map["A_area"]),
             BrestTicket: (seat_map["B_area"] == null ? 0 : seat_map["B_area"]),

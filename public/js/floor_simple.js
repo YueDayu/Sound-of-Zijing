@@ -1,12 +1,12 @@
 ﻿
-var ticketLeft = new Object();
+/*var ticketLeft = new Object();
 ticketLeft.A = 1;
 ticketLeft.B = 0;
 ticketLeft.C = 3;
 ticketLeft.D = 5;
 ticketLeft.E = 7;
 var stateCode = 0;
-var maxtickets = 3;
+var maxtickets = 3; */
 var all_selected_tickets_count = 0;
 
 $(document).ready(function() {
@@ -101,7 +101,7 @@ $("#choose").find("a").click(function() {
 //提交按钮的点击事件
 $("#buttom_frame").click(function(){
 	var url = window.location.href;
-	if (selected != 0){
+	if (all_selected_tickets_count != 0){
 		$("#submitArea").html('<form name=myForm><input type=hidden name=ticket_id><input type=hidden name=seat><input type=hidden name=stateCode></form>');
 	    var myForm=document.forms['myForm'];
 	    myForm.action=url;
