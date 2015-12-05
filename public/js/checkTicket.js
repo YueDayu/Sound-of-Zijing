@@ -87,14 +87,25 @@ function refundConfirm(){
     $("#alertInfo").html(info);
     $("#alertFrame").css("display", "inherit");
     $("#alertFrame").animate({
-        top: '50%',
-        opacity: '.9',
+        top: '40%',
+        opacity: '.7',
     }, 500, function(){
 
     });
     $('#confirm_rfd_btn').click(function(){
         //把退票信息传给服务器
+            var refund_info = "以下文字已经复制到剪贴板，请回到微信公众号页面粘贴并发送，即可退票。若未能成功复制，请手动复制粘贴。"+
+            "<br><br><input id='input_refund_info' value = '退票 "+ticket.name+" "+ticket.refund_id+"'>";
+            $("#alertInfo").html(refund_info);
+            $("#alertInfo").css("padding", "5%");
+            $("#alertInfo").css("line-height", "130%");
+            $("#alertFrame").animate({
+                top: '35%',
+                opacity: '.7',
+            }, 500, function(){
 
+            });
+            $("#input_refund_info").css('width', '80%');
     });
     $('#cancel_rfd_btn').click(function(){
         $("#alertFrame").css("display", "none");
