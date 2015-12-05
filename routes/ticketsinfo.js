@@ -102,6 +102,10 @@ router.get('/', function (req, res) {
             res.send("该票对应活动还未开始！");
         } else { // read from cache
             var activity = all_activity[activity_id];
+            if (!activity.user_map[student_id]) {
+                res.send("不要捣乱，你的student_id没有票！！");
+                return;
+            }
             var ticket_info = activity.user_map[student_id].tickets[ticket_id];
             if (!ticket_info) {
                 res.send("不要捣乱，你的ticketid没有对应的票！！");
@@ -172,8 +176,8 @@ router.get('/', function (req, res) {
                 act_need_seat: docs1[0].need_seat,
                 seat: tiSeat,
                 ticket_status: ticket_status,
-                ticket_price: docs[0].cost,
-                has_paid: (docs[0].cost == 0 || ticketstatus == 2),
+                ticket_price: ticket_info.cost,
+                has_paid: (ticket_info.cost == 0 || ticketstatus == 2),
                 act_book_end: getTime(be)
             });
         }
