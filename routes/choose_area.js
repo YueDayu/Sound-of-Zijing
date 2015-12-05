@@ -71,8 +71,6 @@ function checkValidity(req, res, callback) {
 
     var ticket = all_activity[activityid].user_map[stuid].tickets[ticketid];
     if (ticket.seat != "") {
-        var tres = translateSeatNum(ticket.seat[0], ticket.seat.substr(1));
-        if (tres.c < 10) tres.c = "0" + tres.c;
         res.render("alert",
             {
                 errorinfo: "已经选过座位啦！座位是" + ticket.seat,
