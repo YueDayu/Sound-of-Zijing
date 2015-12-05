@@ -116,7 +116,11 @@ function presentTicket(msg, res, stuID, act) {
         if (!user_tickets.tickets[x]) {
             continue;
         }
-        tmp += template.getHyperLink("点我查看第" + i + "张电子票", urls.ticketInfo + "?ticketid="
+        var seat_info = "(未选座)";
+        if (user_tickets.tickets[x].seat && user_tickets.tickets[x].seat != "") {
+            seat_info = "(座位为" + user_tickets.tickets[x].seat + ")"
+        }
+        tmp += template.getHyperLink("点我查看第" + i + "张电子票" + seat_info, urls.ticketInfo + "?ticketid="
             + user_tickets.tickets[x].unique_id + "&stuid=" + stuID + "&actid=" + act.activity_info._id);
         i++;
         tmp += '\n';
