@@ -152,8 +152,14 @@ router.get('/', function (req, res) {
                 }
             }
             var be = new Date(docs1[0].book_end);
+            var valid_refund = (act.status == 0 || act.status == 1) ? 1 : 0;
+            var refund_id = "";
+            if (valid_refund == 1) {
+
+            }
             res.render('checkTicket', {
-                act_valid_refund: (act.status == 0 || act.status == 1) ? 1 : 0,
+                act_valid_refund: valid_refund,
+                refund_id: refund_id,
                 act_name: activityName,
                 act_photo: activityPhoto,
                 act_place: activityPlace,
@@ -230,6 +236,7 @@ router.get('/', function (req, res) {
                         var be = new Date(docs1[0].book_end);
                         res.render('checkTicket', {
                             act_valid_refund: 0,
+                            refund_id: "",
                             act_name: activityName,
                             act_photo: activityPhoto,
                             act_place: activityPlace,

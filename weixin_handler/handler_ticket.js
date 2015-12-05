@@ -17,16 +17,16 @@ var ACTIVITY_DB = model.activities;
 var db = model.db;
 var redis_db = model.redis_db;
 
-var alphabet = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM0123456789_+-()<>!@#$%^&*";
+var alphabet = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM0123456789_+-()!@$^*";
 
 var act_cache = {};
 //var rem_cache = {};
 //var tik_cache = {};
 var usr_lock = {};
 
-exports.clearCache = function () {
-    act_cache = {};
-};
+//exports.clearCache = function () {
+//    act_cache = {};
+//};
 
 function verifyStudent(openID, ifFail, ifSucc) {
     redis_db.get(USER_DB + '_' + openID, function (err, res) {
@@ -38,6 +38,14 @@ function verifyStudent(openID, ifFail, ifSucc) {
     });
 }
 exports.verifyStu = verifyStudent;
+
+exports.encode_refund_id = function(activity_id, stu_id, ticket_id) {
+
+};
+
+function decode_refund_id(refund_id) {
+
+}
 
 function verifyActivities(actKey, ifFail, ifSucc) {
     var timer = new Date();
