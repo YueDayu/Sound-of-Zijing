@@ -157,6 +157,22 @@ function generateUniqueCode(stu_id, act_id, tic_index) {
     return res;
 }
 
+function get_seat_show(tic_seat, need_seat) {
+    var seat_info = "(未选座)";
+    if (tic_seat && tic_seat != "") {
+        var seat = "";
+        if (need_seat == 1) {
+            seat = tic_seat[0] + "区";
+        } else if (need_seat == 2) {
+            var tres = translateSeatNum(tic_seat[0], tic_seat.substr(1));
+            if (tres.c < 10) tres.c = "0" + tres.c;
+            seat = tres.r + "排" + tres.c + "座";
+        }
+        seat_info = "(座位为" + seat + ")"
+    }
+    return seat_info;
+}
+
 function presentTicket(msg, res, stuID, act) {
     var user_tickets = act.user_map[stuID];
     var tmp = "恭喜，抢票成功！您现在有" + user_tickets.num + "张票:\n";
@@ -165,20 +181,8 @@ function presentTicket(msg, res, stuID, act) {
         if (!user_tickets.tickets[x]) {
             continue;
         }
-        var seat_info = "(未选座)";
-        if (user_tickets.tickets[x].seat && user_tickets.tickets[x].seat != "") {
-            var seat = "";
-            if (act.activity_info.need_seat == 1) {
-                seat = user_tickets.tickets[x].seat[0] + "区";
-            }
-            if (act.activity_info.need_seat == 2) {
-                var tres = translateSeatNum(user_tickets.tickets[x].seat[0], user_tickets.tickets[x].seat.substr(1));
-                if (tres.c < 10) tres.c = "0" + tres.c;
-                seat = tres.r + "排" + tres.c + "座";
-            }
-            seat_info = "(座位为" + seat + ")"
-        }
-        tmp += template.getHyperLink("点我查看第" + i + "张电子票" + seat_info, urls.ticketInfo + "?ticketid="
+        tmp += template.getHyperLink("点我查看第" + i + "张电子票"
+            + get_seat_show(user_tickets.tickets[x].seat, act.activity_info.need_seat), urls.ticketInfo + "?ticketid="
             + user_tickets.tickets[x].unique_id + "&stuid=" + stuID + "&actid=" + act.activity_info._id);
         i++;
         tmp += '\n';
@@ -379,6 +383,7 @@ function renderTicketList(oneTicket, oneActivity, isSingle) {
     } else {
         ret[template.rich_attr.title] = oneActivity.name;
     }
+    ret[template.rich_attr.title] += get_seat_show(oneTicket.seat, oneActivity.need_seat);
     ret[template.rich_attr.url] = urls.ticketInfo + "?ticketid=" + oneTicket.unique_id
         + "&stuid=" + oneTicket.stu_id + "&actid=" + oneActivity._id;
     ret[template.rich_attr.picture] = oneActivity.pic_url;
