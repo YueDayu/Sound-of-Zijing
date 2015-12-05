@@ -15,7 +15,7 @@
     margin:9px;
     padding:0 9px 9px 9px;
     background: url(../img/ticket.gif);
-    height:100px;
+    height:auto;
 }
 
 .btn
@@ -75,4 +75,8 @@
 #ticket_getting
 {
     color:#dd001e;
+}
+
+#bottom_info{
+  height: auto;
 }
