@@ -38,7 +38,7 @@ router.get("/", function (req, res, next) {
 
     console.log(current_activity);
 
-    if (current_activity[all_activity[theActID].activity_key] != null) { // if in the cache.
+    if (all_activity[theActID] && current_activity[all_activity[theActID].activity_key] != null) { // if in the cache.
         console.log(current_activity);
         var theAct = all_activity[theActID].activity_info;
         var nowStatus = 0;
