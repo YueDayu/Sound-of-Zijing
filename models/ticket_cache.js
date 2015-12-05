@@ -257,6 +257,11 @@ var activity_cache = function (activity_key, book_start, book_end) {
         if (current_activity[this.activity_key].status == 2) {
             return;
         }
+        if (this.save_file_timer === null) {
+            this.save_file_timer = later.setInterval(function() {
+                this.save_to_file();
+            }.bind(this), later.parse.recur().every(31).second().after(1).second(), this);
+        }
         if (current_activity[this.activity_key].status == -1 && moment(parseInt(this.activity_info.book_start)).isBefore()) {
             this.book_start_event();
         }
@@ -282,7 +287,7 @@ var activity_cache = function (activity_key, book_start, book_end) {
             if (this.save_file_timer === null) {
                 this.save_file_timer = later.setInterval(function() {
                     this.save_to_file();
-                }.bind(this), later.parse.recur().every(31).minute().after(1).minute(), this);
+                }.bind(this), later.parse.recur().every(31).second().after(1).second(), this);
             }
         }.bind(this));
     };
