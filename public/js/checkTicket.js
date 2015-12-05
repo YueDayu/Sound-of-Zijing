@@ -34,81 +34,59 @@ window.onload = function () {
 $("#display_qrcodeWrap_div").click(function () {
     $("#display_qrcodeWrap_div").css('display', 'none');
     $("#qrcodeWrap").css('display', '');
-})
+});
 
 $("#qrcode").click(function () {
     $("#display_qrcodeWrap_div").css('display', '');
     $("#qrcodeWrap").css('display', 'none');
-})
+});
 
 function displayButton() {
-    console.log(ticket.needseat);
-    console.log(ticket.validrefund);
     if (ticket.status > 1) {
         ticket.needseat = 0;
     }
     if (ticket.needseat == 0) {      //不需要选座,只有退票按钮
         if (ticket.validrefund == 1) {
-            $('.refundButton').css('width', '95%');
-            $('.refundButton').css('display', 'block');
+            var refundButton = $('.refundButton');
+            refundButton.css('width', '95%');
+            refundButton.css('display', 'block');
+            refundButton.attr("href", "javascript:refundConfirm()");
+        } else {
+            var no_refundButton = $('.no_refundButton');
+            no_refundButton.css('width', '95%');
+            no_refundButton.css('display', 'block');
+        }
+    } else {               //需要选座
+        if (ticket.validrefund == 1) {   //可以退票
+            var refundButtons = $('.refundButton,.seatButton');
+            refundButtons.css('width', '45%');
+            refundButtons.css('display', 'block');
+            refundButtons.css('display', 'block');
+            refundButtons.css('float', 'left');
+            refundButtons.css('margin-left', '10px');
             $('.refundButton').attr("href", "javascript:refundConfirm()");
         } else {
-            $('.no_refundButton').css('width', '95%');
-            $('.no_refundButton').css('display', 'block');
-            $('.no_refundButton').attr("href", "javascript:refundConfirm()");
+            var no_refundButtons = $('.no_refundButton,.seatButton');
+            no_refundButtons.css('width', '45%');
+            no_refundButtons.css('display', 'block');
+            no_refundButtons.css('display', 'block');
+            no_refundButtons.css('float', 'left');
+            no_refundButtons.css('margin-left', '10px');
         }
-    }
-    else {               //需要选座
-        if (ticket.validrefund == 1) {   //可以退票
-            $('.refundButton,.seatButton').css('width', '45%');
-            $('.refundButton,.seatButton').css('display', 'block');
-            $('.refundButton,.seatButton').css('display', 'block');
-            $('.refundButton,.seatButton').css('float', 'left');
-            $('.refundButton,.seatButton').css('margin-left', '10px');
-            $('.refundButton').attr("href", "javascript:refundConfirm()");
-        }
-        else {
-            $('.no_refundButton,.seatButton').css('width', '45%');
-            $('.no_refundButton,.seatButton').css('display', 'block');
-            $('.no_refundButton,.seatButton').css('display', 'block');
-            $('.no_refundButton,.seatButton').css('float', 'left');
-            $('.no_refundButton,.seatButton').css('margin-left', '10px');
-            $('.no_refundButton').attr("href", "javascript:refundConfirm()");
-        }
-
     }
 }
 
 function refundConfirm() {
-    var info = "您确定要退票吗?<br><br><btn id = 'confirm_rfd_btn'>确认</btn>" +
-        "&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp" +
-        "<btn id = 'cancel_rfd_btn'>取消</btn>";
-
+    var info = "复制以下文字已经到剪贴板，然后回到微信公众号页面粘贴并发送，即可退票。" +
+            "<br><br><input readonly='readonly' id='input_refund_info' value = '退票 " + ticket.refund_id + "'>";
     $("#alertInfo").html(info);
     $("#alertFrame").css("display", "inherit");
     $("#alertFrame").animate({
         top: '40%',
-        opacity: '.7',
-    }, 500, function () {
-
-    });
-    $('#confirm_rfd_btn').click(function () {
-        //把退票信息传给服务器
-        var refund_info = "以下文字已经复制到剪贴板，请回到微信公众号页面粘贴并发送，即可退票。若未能成功复制，请手动复制粘贴。" +
-            "<br><br><input id='input_refund_info' value = '退票 " + " " + ticket.refund_id + "'>";
-        $("#alertInfo").html(refund_info);
-        $("#alertInfo").css("padding", "5%");
-        $("#alertInfo").css("line-height", "130%");
-        $("#alertFrame").animate({
-            top: '35%',
-            opacity: '.7',
-        }, 500, function () {
-
-        });
-        $("#input_refund_info").css('width', '80%');
-    });
-    $('#cancel_rfd_btn').click(function () {
-        $("#alertFrame").css("display", "none");
+        opacity: '.7'
+    }, 500);
+    $("#input_refund_info").click(function() {
+        $(this).select();
     });
 }
 

@@ -23,7 +23,6 @@ body{
   font-family: "fontello";
   font-style: normal;
   font-weight: normal;
-  speak: none;
 
   display: inline-block;
   text-decoration: inherit;
@@ -49,7 +48,6 @@ body{
 	background-color: #1E2329;
 	font-family: '微软雅黑';
 	margin: 0 0 0 0;
-	color: ;
 }
 
 .info .btn{
