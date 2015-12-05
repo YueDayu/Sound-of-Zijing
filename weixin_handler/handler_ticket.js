@@ -174,7 +174,7 @@ exports.faire_get_ticket = function (msg, res) {
     actName = part[0];
     var ticket_num = 1;
     if (part.length > 1) {
-        ticket_num = parseInt(actName[1]);
+        ticket_num = parseInt(part[1]);
     }
     if (!ticket_num) {
         res.send(template.getPlainTextTemplate(msg,
