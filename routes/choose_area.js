@@ -34,7 +34,7 @@ function checkValidity(req, res, callback) {
     var all_activity = ticket_cache.all_activity;
     var current_activity = ticket_cache.current_activity;
 
-    if (all_activity[activityid] == undefined || all_activity[activityid] == null) {
+    if (all_activity[activityid] == null) {
         res.render("alert",
         {
             errorinfo: "activity not found or has expired",
@@ -44,7 +44,7 @@ function checkValidity(req, res, callback) {
     }
 
     var activity = all_activity[activityid];
-    if (current_activity[activity.activity_key] == undefined || current_activity[activity.activity_key] == null) {
+    if (current_activity[activity.activity_key] == null) {
         res.render("alert",
         {
             errorinfo: "activity has expired",
@@ -226,6 +226,8 @@ router.get("/", function (req, res) {
 
 router.post("/", function (req, res) {
     checkValidity(req, res, function (ticketID, activityID, stuID) {
+        console.log(req.body);
+
         var realName = req.body.seat[0] + "_area";
         console.log(req.body);
 

@@ -3,6 +3,8 @@ var router = express.Router();
 var models = require('../models/models');
 var lock = require('../models/lock');
 
+var encoder = require("../weixin_handler/handler_ticket").encode_refund_id;
+
 var cache = require('../models/ticket_cache.js');
 var all_activity = cache.all_activity;
 var current_activity = cache.current_activity;
@@ -152,8 +154,14 @@ router.get('/', function (req, res) {
                 }
             }
             var be = new Date(docs1[0].book_end);
+            var valid_refund = (act.status == 0 || act.status == 1) ? 1 : 0;
+            var refund_id = "";
+            if (valid_refund == 1) {
+                refund_id = encoder(activityKey, ticket_id);
+            }
             res.render('checkTicket', {
-                act_valid_refund: (act.status == 0 || act.status == 1) ? 1 : 0,
+                act_valid_refund: valid_refund,
+                refund_id: refund_id,
                 act_name: activityName,
                 act_photo: activityPhoto,
                 act_place: activityPlace,
@@ -230,6 +238,7 @@ router.get('/', function (req, res) {
                         var be = new Date(docs1[0].book_end);
                         res.render('checkTicket', {
                             act_valid_refund: 0,
+                            refund_id: "",
                             act_name: activityName,
                             act_photo: activityPhoto,
                             act_place: activityPlace,

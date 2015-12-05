@@ -17,16 +17,16 @@ var ACTIVITY_DB = model.activities;
 var db = model.db;
 var redis_db = model.redis_db;
 
-var alphabet = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM0123456789_+-()<>!@#$%^&*";
+var alphabet = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM0123456789_-()!@$^*";
 
-var act_cache = {};
+//var act_cache = {};
 //var rem_cache = {};
 //var tik_cache = {};
 var usr_lock = {};
 
-exports.clearCache = function () {
-    act_cache = {};
-};
+//exports.clearCache = function () {
+//    act_cache = {};
+//};
 
 function verifyStudent(openID, ifFail, ifSucc) {
     redis_db.get(USER_DB + '_' + openID, function (err, res) {
@@ -38,6 +38,25 @@ function verifyStudent(openID, ifFail, ifSucc) {
     });
 }
 exports.verifyStu = verifyStudent;
+
+function reverse(s) {
+    return s.split("").reverse().join("");
+}
+
+exports.encode_refund_id = function(activity_key, ticket_id) {
+    var res = activity_key + " ";
+    res += reverse(ticket_id);
+    return res;
+};
+
+function decode_refund_id(refund_id) {
+    refund_id += " end";
+    var part = refund_id.split(" ", 2);
+    return {
+        act_key: part[0],
+        ticket_id: reverse(part[1])
+    }
+}
 
 function verifyActivities(actKey, ifFail, ifSucc) {
     var timer = new Date();
@@ -188,7 +207,7 @@ exports.faire_get_ticket = function (msg, res) {
                 };
                 user_info = staticACT.user_map[stuID];
             }
-            if (user_info.num + ticket_num >= staticACT.activity_info.max_tickets) {
+            if (user_info.num + ticket_num > staticACT.activity_info.max_tickets) {
                 res.send(template.getPlainTextTemplate(msg,
                     "你已经有" + user_info.num + "张票啦，每个人最多" + staticACT.activity_info.max_tickets
                     + "张票哦，再抢会炸的！"));
