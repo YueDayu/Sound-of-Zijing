@@ -327,7 +327,6 @@ exports.faire_reinburse_ticket = function (msg, res) {
     }
 
     var refund_info = decode_refund_id(refund_id);
-    console.log(refund_info);
 
     verifyStudent(openID, function() {
         res.send(needValidateMsg(msg));
@@ -407,6 +406,9 @@ exports.faire_list_ticket = function (msg, res) {
                     }
                     if (act.status >= 0) {
                         var activity = all_activity[act.activity_id];
+                        if (current_activity[activity.activity_key].status == 2) {
+                            continue;
+                        }
                         if (activity.user_map[stuID]) {
                             for (var y in activity.user_map[stuID].tickets) {
                                 docs.push(activity.user_map[stuID].tickets[y]);
@@ -422,7 +424,7 @@ exports.faire_list_ticket = function (msg, res) {
                 var actMap = {};
                 var list2Render = [];
                 for (var i = 0; i < docs.length; i++) {
-                    actList.push({_id: docs[i].activity});
+                    actList.push({_id: model.getIDClass(docs[i].activity)});
                 }
                 db[ACTIVITY_DB].find(
                     {

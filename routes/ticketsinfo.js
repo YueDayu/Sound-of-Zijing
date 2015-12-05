@@ -96,7 +96,7 @@ router.get('/', function (req, res) {
     var activity_id = req.query.actid;
     var student_id = req.query.stuid;
 
-    if (all_activity[activity_id] != null) { // if in the cache.
+    if (all_activity[activity_id] != null && current_activity[all_activity[activity_id].activity_key].status != 2) { // if in the cache.
         var act = current_activity[all_activity[activity_id].activity_key];
         if (!act || act.status < 0) {
             res.send("该票对应活动还未开始！");
@@ -191,7 +191,7 @@ router.get('/', function (req, res) {
                 var ticketstatus = docs[0].status;
                 var tiSeat = docs[0].seat;
 
-                db[activities].find({_id: activityid}, function (err, docs1) {
+                db[activities].find({_id: models.getIDClass(activityid)}, function (err, docs1) {
                     if (docs1.length == 0) {
                         res.send("您的票所对应的活动不存在！");
                     } else {
