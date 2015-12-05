@@ -17,9 +17,9 @@ var ACTIVITY_DB = model.activities;
 var db = model.db;
 var redis_db = model.redis_db;
 
-var alphabet = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM0123456789_+-()!@$^*";
+var alphabet = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM0123456789_-()!@$^*";
 
-var act_cache = {};
+//var act_cache = {};
 //var rem_cache = {};
 //var tik_cache = {};
 var usr_lock = {};
