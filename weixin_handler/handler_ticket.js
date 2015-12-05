@@ -334,9 +334,12 @@ exports.faire_list_ticket = function (msg, res) {
             }, function (err, docs) {
                 for (var x in current_activity) {
                     var act = current_activity[x];
+                    if (!act) {
+                        continue;
+                    }
                     if (act.status >= 0) {
                         var activity = all_activity[act.activity_id];
-                        if (!activity.user_map[stuID]) {
+                        if (activity.user_map[stuID]) {
                             for (var y in activity.user_map[stuID].tickets) {
                                 docs.push(activity.user_map[stuID].tickets[y]);
                             }
