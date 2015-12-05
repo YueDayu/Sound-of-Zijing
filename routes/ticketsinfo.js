@@ -3,6 +3,8 @@ var router = express.Router();
 var models = require('../models/models');
 var lock = require('../models/lock');
 
+var encoder = require("../weixin_handler/handler_ticket").encode_refund_id;
+
 var cache = require('../models/ticket_cache.js');
 var all_activity = cache.all_activity;
 var current_activity = cache.current_activity;
@@ -155,7 +157,7 @@ router.get('/', function (req, res) {
             var valid_refund = (act.status == 0 || act.status == 1) ? 1 : 0;
             var refund_id = "";
             if (valid_refund == 1) {
-
+                refund_id = encoder(activityKey, ticket_id);
             }
             res.render('checkTicket', {
                 act_valid_refund: valid_refund,

@@ -39,12 +39,23 @@ function verifyStudent(openID, ifFail, ifSucc) {
 }
 exports.verifyStu = verifyStudent;
 
-exports.encode_refund_id = function(activity_id, stu_id, ticket_id) {
+function reverse(s) {
+    return s.split("").reverse().join("");
+}
 
+exports.encode_refund_id = function(activity_key, ticket_id) {
+    var res = activity_key + " ";
+    res += reverse(ticket_id);
+    return res;
 };
 
 function decode_refund_id(refund_id) {
-
+    refund_id += " end";
+    var part = refund_id.split(" ", 2);
+    return {
+        act_key: part[0],
+        ticket_id: reverse(part[1])
+    }
 }
 
 function verifyActivities(actKey, ifFail, ifSucc) {
