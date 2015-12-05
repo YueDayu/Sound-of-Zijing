@@ -75,9 +75,11 @@ function verifyActivities(actKey, ifFail, ifSucc) {
             return;
         }
         ifFail(book_start - current);
-    } else if (activity.status < 0 || activity.status > 0) { // not start
+    } else if (activity.status < 0) { // not start
         book_start = all_activity[activity.activity_id].book_start;
         ifFail(book_start - current);
+    } else if (activity.status > 0) {
+        ifFail();
     } else {
         ifSucc(activity.activity_id, all_activity[activity.activity_id]);
     }
@@ -119,9 +121,11 @@ function presentTicket(msg, res, stuID, act) {
     for (var x in user_tickets.tickets) {
         tmp += template.getHyperLink("点我查看第" + i + "张电子票", urls.ticketInfo + "?ticketid="
             + user_tickets.tickets[x].unique_id + "&stuid=" + stuID + "&actid=" + act.activity_info._id);
+        i++;
+        tmp += '\n';
     }
     if (act.activity_info.need_seat != 0)
-        tmp += "\n注意:选座（区）将在抢票结束一小时之后截止，请尽快前往电子票选座。";
+        tmp += "注意:选座（区）将在抢票结束一小时之后截止，请尽快前往电子票选座。";
     res.send(template.getPlainTextTemplate(msg, tmp));
 }
 
@@ -249,38 +253,35 @@ exports.check_reinburse_ticket = function (msg) {
 };
 
 exports.faire_reinburse_ticket = function (msg, res) {
-    var actName, openID;
+    var openID = msg.FromUserName[0];
+    var refund_id = "";
     if (msg.Content[0] === "退票") {
-        //WARNING: Fill the activity name!!
         res.send(template.getPlainTextTemplate(msg, "请使用“退票 活动代称”的命令完成指定活动的退票。"));
         return;
-    }
-    else {
-        actName = msg.Content[0].substr(3);
+    } else {
+        refund_id = msg.Content[0].substr(3);
     }
 
-    openID = msg.FromUserName[0];
-    verifyStudent(openID, function () {
-        //WARNING: may change to direct user to bind
+    var refund_info = decode_refund_id(refund_id);
+
+    verifyStudent(openID, function() {
         res.send(needValidateMsg(msg));
     }, function (stuID) {
-        verifyActivities(actName, function () {
+        verifyActivities(refund_info.act_key, function () {
             res.send(template.getPlainTextTemplate(msg, "目前没有符合要求的活动处于退票期。"));
         }, function (actID, act) {
-            if (act.user_map[stuID].num == 0) {
+            var stu_tickets = act.user_map[stuID];
+            if (!stu_tickets || stu_tickets.num == 0) {
                 res.send(template.getPlainTextTemplate(msg,
                     "未找到您的抢票记录，退票失败。"));
                 return;
             }
-            if (act.user_map[stuID].num != 1) {
+            var ticket = stu_tickets.tickets[refund_info.ticket_id];
+            if (!ticket) {
                 res.send(template.getPlainTextTemplate(msg,
-                    "您在该活动中一共有" + act.user_map[stuID].num + "张票，请进入票夹单独退票。"));
+                    "您的票夹中没有这张票，退票失败。"));
                 return;
             }
-            var ticket_id;
-            for (ticket_id in act.user_map[stuID].tickets) {
-            }
-            var ticket = act.user_map[stuID].tickets[ticket_id];
             if (ticket.status != 1) {
                 res.send(template.getPlainTextTemplate(msg,
                     "未找到您的抢票记录或您的票已经支付，退票失败。如为已支付票，请联系售票机构退还钱款后退票。"));
@@ -291,7 +292,8 @@ exports.faire_reinburse_ticket = function (msg, res) {
                     act.seat_map[ticket.seat]++;
                 }
                 act.activity_info.remain_tickets++;
-                act.user_map[stuID] = null;
+                stu_tickets.tickets[refund_info.ticket_id] = null;
+                stu_tickets.num--;
                 res.send(template.getPlainTextTemplate(msg, "退票成功。"));
                 lock.release('cache' + act.activity_info.key);
             });
