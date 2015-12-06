@@ -287,7 +287,7 @@ var activity_cache = function (activity_key, book_start, book_end) {
             if (this.save_file_timer === null) {
                 this.save_file_timer = later.setInterval(function() {
                     this.save_to_file();
-                }.bind(this), later.parse.recur().every(31).second().after(1).second(), this);
+                }.bind(this), later.parse.recur().every(31).minute().after(1).second(), this);
             }
         }.bind(this));
     };

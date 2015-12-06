@@ -382,7 +382,9 @@ function renderTicketList(oneTicket, oneActivity, isSingle) {
     } else {
         ret[template.rich_attr.title] = oneActivity.name;
     }
-    ret[template.rich_attr.title] += get_seat_show(oneTicket.seat, oneActivity.need_seat);
+    if (oneActivity.need_seat > 0) {
+        ret[template.rich_attr.title] += get_seat_show(oneTicket.seat, oneActivity.need_seat);
+    }
     ret[template.rich_attr.url] = urls.ticketInfo + "?ticketid=" + oneTicket.unique_id
         + "&stuid=" + oneTicket.stu_id + "&actid=" + oneActivity._id;
     ret[template.rich_attr.picture] = oneActivity.pic_url;
