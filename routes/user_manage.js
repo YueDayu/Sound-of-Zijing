@@ -868,6 +868,11 @@ router.post("/detail", function (req, res) {
                                 lock.release(ACTIVITY_DB);
                                 return;
                             }
+                            if (activity["max_tickets"]) {
+                                res.send("404#抢票已开始，不允许更改每人最多票数！请重新检查。");
+                                lock.release(ACTIVITY_DB);
+                                return;
+                            }
                             if (activity["description"])
                                 activity["description"] = activity["description"].replace(/\r?\n/g, "\\n");
 
@@ -881,6 +886,7 @@ router.post("/detail", function (req, res) {
                                     all_activity[idObj].set_time(updated_act.book_start, updated_act.book_end);
                                     if (current_activity[updated_act.key] && current_activity[updated_act.key].status > -2) {
                                         lock.acquire('cache' + updated_act.key, function(){
+                                            updated_act.remain_tickets = all_activity[idObj].activity_info.remain_tickets;
                                             all_activity[idObj].activity_info = updated_act;
                                             lock.release('cache' + updated_act.key)
                                         });
@@ -1011,7 +1017,7 @@ router.post("/detail", function (req, res) {
                                 if (updated_act.status == 1) { // Just for the publish activities
                                     all_activity[idObj].set_time(updated_act.book_start, updated_act.book_end);
                                     if (current_activity[updated_act.key] && current_activity[updated_act.key].status > -2) {
-                                        lock.acquire('cache' + updated_act.key, function(){
+                                        lock.acquire('cache' + updated_act.key, function() {
                                             all_activity[idObj].activity_info = updated_act;
                                             lock.release('cache' + updated_act.key)
                                         });

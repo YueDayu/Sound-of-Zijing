@@ -413,6 +413,9 @@ function lockByStatus(status, book_start, start_time, end_time) {
             },
             'price': function () {
                 return (new Date() >= getDateByObj(book_start));
+            },
+            'max_tickets': function() {
+                return (new Date() >= getDateByObj(book_start));
             }
         },
         '99': {
@@ -430,7 +433,8 @@ function lockByStatus(status, book_start, start_time, end_time) {
             'pic_url': true,
             'uploadPic': true,
             'seat_arrange': true,
-            'price': true
+            'price': true,
+            'max_tickets': true
         }
     }, key;
     for (key in keyMap) {
