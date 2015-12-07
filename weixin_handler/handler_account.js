@@ -116,13 +116,15 @@ exports.check_apply_exp = function (msg) {
             return true;
     return false;
 };
+var current_id = 0;
 exports.faire_apply_exp = function (msg, res) {
 
     var openID = msg.FromUserName[0];
     handler_ticket.verifyStu(openID, function () {
         lock.acquire(USER_DB, function () {
-            redis_db.set(USER_DB + '_' + openID, '2333333333', function() {
+            redis_db.set(USER_DB + '_' + openID, current_id + "", function() {
                 lock.release(USER_DB);
+                current_id++;
                 res.send(template.getPlainTextTemplate(msg, "获取实验账号成功"));
             });
         });
