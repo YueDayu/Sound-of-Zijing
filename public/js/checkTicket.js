@@ -78,7 +78,7 @@ function displayButton() {
 
 function refundConfirm() {
     var info = "复制以下文字已经到剪贴板，然后回到微信公众号页面粘贴并发送，即可退票。" +
-            "<br><br><input readonly='readonly' id='input_refund_info' value = '退票 " + ticket.refund_id + "'>";
+            "<br><br><input id='input_refund_info' value = '退票 " + ticket.refund_id + "'>";
     $("#alertInfo").html(info);
     $("#alertFrame").css("display", "inherit");
     $("#alertFrame").animate({
