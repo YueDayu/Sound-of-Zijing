@@ -80,7 +80,6 @@ function displayButton() {
 }
 
 function refundConfirm() {
-    prompt("请长按复制以下文字，并发送给我们的公众号",ticket.refund_id);
     var info = "复制以下文字已经到剪贴板，然后回到微信公众号页面粘贴并发送，即可退票。" +
             "<br><br><input id='input_refund_info' value = '退票 " + ticket.refund_id + "'>";
     $("#alertInfo").html(info);
