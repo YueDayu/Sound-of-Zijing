@@ -106,8 +106,11 @@ function verifyActivities(actKey, ifFail, ifSucc) {
     var current = timer.getTime();
     var book_start = 0;
     var activity = current_activity[actKey];
-    if (activity == null) {
+    if (activity == null || !activity) {
         for (var x in all_activity) {
+            if (all_activity[x] == null || !all_activity[x]) {
+                continue;
+            }
             if (all_activity[x].activity_key == actKey) {
                 book_start = all_activity[x].book_start;
                 break;
