@@ -106,8 +106,11 @@ function verifyActivities(actKey, ifFail, ifSucc) {
     var current = timer.getTime();
     var book_start = 0;
     var activity = current_activity[actKey];
-    if (activity == null) {
+    if (activity == null || !activity) {
         for (var x in all_activity) {
+            if (all_activity[x] == null || !all_activity[x]) {
+                continue;
+            }
             if (all_activity[x].activity_key == actKey) {
                 book_start = all_activity[x].book_start;
                 break;
@@ -382,7 +385,9 @@ function renderTicketList(oneTicket, oneActivity, isSingle) {
     } else {
         ret[template.rich_attr.title] = oneActivity.name;
     }
-    ret[template.rich_attr.title] += get_seat_show(oneTicket.seat, oneActivity.need_seat);
+    if (oneActivity.need_seat > 0) {
+        ret[template.rich_attr.title] += get_seat_show(oneTicket.seat, oneActivity.need_seat);
+    }
     ret[template.rich_attr.url] = urls.ticketInfo + "?ticketid=" + oneTicket.unique_id
         + "&stuid=" + oneTicket.stu_id + "&actid=" + oneActivity._id;
     ret[template.rich_attr.picture] = oneActivity.pic_url;

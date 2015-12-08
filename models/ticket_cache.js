@@ -287,7 +287,7 @@ var activity_cache = function (activity_key, book_start, book_end) {
             if (this.save_file_timer === null) {
                 this.save_file_timer = later.setInterval(function() {
                     this.save_to_file();
-                }.bind(this), later.parse.recur().every(31).second().after(1).second(), this);
+                }.bind(this), later.parse.recur().every(31).minute().after(1).second(), this);
             }
         }.bind(this));
     };
@@ -333,8 +333,10 @@ var activity_cache = function (activity_key, book_start, book_end) {
                 if (save_item_num == 0) { // finished all
                     var id = this.activity_info._id;
                     current_activity[this.activity_key] = null;
+                    delete current_activity[this.activity_key];
                     this.clear_activity();
                     all_activity[id] = null;
+                    delete all_activity[id];
                     lock.release('cache' + this.activity_key);
                     this.save_to_file(id);
                 }
@@ -347,8 +349,10 @@ var activity_cache = function (activity_key, book_start, book_end) {
                         if (save_item_num == 0) { // finished all
                             var id = this.activity_info._id;
                             current_activity[this.activity_key] = null;
+                            delete current_activity[this.activity_key];
                             this.clear_activity();
                             all_activity[id] = null;
+                            delete all_activity[id];
                             lock.release('cache' + this.activity_key);
                             this.save_to_file(id);
                         }

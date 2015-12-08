@@ -64,8 +64,11 @@ function displayButton() {
             refundButtons.css('display', 'block');
             refundButtons.css('float', 'left');
             refundButtons.css('margin-left', '10px');
+            /*$('.refundButton').click(function(){
+                prompt("copy following words,and send it to our",ticket.refund_id);
+            });*/
             $('.refundButton').attr("href", "javascript:refundConfirm()");
-        } else {
+            } else {
             var no_refundButtons = $('.no_refundButton,.seatButton');
             no_refundButtons.css('width', '45%');
             no_refundButtons.css('display', 'block');
@@ -78,15 +81,16 @@ function displayButton() {
 
 function refundConfirm() {
     var info = "复制以下文字已经到剪贴板，然后回到微信公众号页面粘贴并发送，即可退票。" +
-            "<br><br><input readonly='readonly' id='input_refund_info' value = '退票 " + ticket.refund_id + "'>";
+            "<br><br><input id='input_refund_info' value = '退票 " + ticket.refund_id + "'>";
     $("#alertInfo").html(info);
     $("#alertFrame").css("display", "inherit");
     $("#alertFrame").animate({
         top: '40%',
-        opacity: '.7'
+        opacity: '.75'
     }, 500);
     $("#input_refund_info").click(function() {
-        $(this).select();
+        $("#alertFrame").css("display", "none");
+        prompt("复制以下文字并发送给我们的公众号",'退票 '+ ticket.refund_id);
     });
 }
 
