@@ -59,7 +59,7 @@ function add_to_html()
             time_left-=100;
             $('#ticket_getting')[0].innerHTML=
                 activity_ticket_status>=2?'抢票已结束':
-                    ((activity_ticket_status?'距抢票结束还有:<br>':'抢票倒计时:<br>')+'　　'+(show_time(time_left)));
+                    ((activity_ticket_status?'距抢票结束还有:<br>':'距抢票开始还有:<br>')+'　　'+(show_time(time_left)));
         },100);
     }
     else
@@ -82,7 +82,7 @@ function add_to_html()
             }
             $('#ticket_getting')[0].innerHTML=
                 activity_ticket_status>=2?'抢票已结束':
-                    ((activity_ticket_status?'距抢票结束还有:<br>':'抢票倒计时:<br>')+'　　'+(show_time(time_left)));
+                    ((activity_ticket_status?'距抢票结束还有:<br>':'距抢票开始还有:<br>')+'　　'+(show_time(time_left)));
         },100);
     }
 }
