@@ -129,8 +129,8 @@ function initETicket() {
 
     //仅在综体区有座位引导
     if (ticket.needseat == 1 && ticket.status > 1) {
-        $("#eTicket").css("width", "50%");
-        $("#mapGuide").css("display", "");
+        $("#eTicket").css("width", "100%");
+        //$("#mapGuide").css("display", "");
         $("#blockNotify").css("display", "");
     }
 
@@ -220,10 +220,10 @@ function waitSeatSelection() {
 }
 
 $("#eTicket").click(function () {
-    $("#mapGuide").attr("class", "");
+    //$("#mapGuide").attr("class", "");
     $("#eTicket").attr("class", "active");
-    $("#guideMap-zt").css("display", "none");
-    $("#guideMap-xq").css("display", "none");
+    //$("#guideMap-zt").css("display", "none");
+    //$("#guideMap-xq").css("display", "none");
     /*
      if(status > 3 || status < 1)
      status = 0;
@@ -234,7 +234,7 @@ $("#eTicket").click(function () {
     $(".cz_order").css("display", "");
 });
 
-$("#mapGuide").click(function () {
+/*$("#mapGuide").click(function () {
     var w = ticket.seat.substring(0, 1);
     if ((w > 'E' || w < 'A') && ticket.status == 2) {
         alertInfo("系统24小时内为您分配座位。");
@@ -256,7 +256,7 @@ $("#mapGuide").click(function () {
     $(".cz_order").css("display", "none");
 
     initMapZt();
-});
+});*/
 
 //author: 林聪
 //function: 设置图片的长宽比，可适
