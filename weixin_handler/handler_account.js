@@ -109,16 +109,29 @@ exports.faire_get_help = function (msg, res) {
     res.send(template.getRichTextTemplate(msg, showList));
 };
 //============================================
+var debug_mode = true;
+
 exports.check_apply_exp = function (msg) {
     //return false;
     if (msg.MsgType[0] === "text")
         if (msg.Content[0] === "获取实验账号")
-            return true;
+            return debug_mode;
     return false;
 };
-var current_id = 0;
-exports.faire_apply_exp = function (msg, res) {
 
+if (debug_mode) {
+    var current_id = 100;
+    redis_db.dbsize(function (err, data) {
+        console.log('user num: ' + data);
+        current_id = data + 1;
+    });
+}
+
+exports.faire_apply_exp = function (msg, res) {
+    if (!debug_mode) {
+        res.send(template.getPlainTextTemplate(msg, "当前不是开发模式，不要捣乱！"));
+        return;
+    }
     var openID = msg.FromUserName[0];
     handler_ticket.verifyStu(openID, function () {
         lock.acquire(USER_DB, function () {

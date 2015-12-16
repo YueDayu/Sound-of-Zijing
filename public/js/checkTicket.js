@@ -64,6 +64,9 @@ function displayButton() {
             refundButtons.css('display', 'block');
             refundButtons.css('float', 'left');
             refundButtons.css('margin-left', '10px');
+            /*$('.refundButton').click(function(){
+                prompt("copy following words,and send it to our",ticket.refund_id);
+            });*/
             $('.refundButton').attr("href", "javascript:refundConfirm()");
             } else {
             var no_refundButtons = $('.no_refundButton,.seatButton');
@@ -87,7 +90,7 @@ function refundConfirm() {
     }, 500);
     $("#input_refund_info").click(function() {
         $("#alertFrame").css("display", "none");
-        prompt("请长按复制以下文字，并发送给我们的公众号",ticket.refund_id);
+        prompt("复制以下文字并发送给我们的公众号",'退票 '+ ticket.refund_id);
     });
 }
 
