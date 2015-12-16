@@ -32,7 +32,7 @@
 				break;
 		case 2: alertInfo("选座超时<br>请重新选座");
 				break;
-		default: alertInfo("未连入wifi,网页已切入极速版<br>请点击图示区域进行选座");
+		default: alertInfo("请点击图示区域进行选座");
 				break;
 	}
 	//渲染结束
