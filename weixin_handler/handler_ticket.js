@@ -243,7 +243,7 @@ exports.faire_get_ticket = function (msg, res) {
   actName = actName.trim();
   var part = actName.split(" ");
   actName = part[0];
-  var ticket_num = 1;
+  var ticket_num = 0;
   if (part.length > 1) {
     ticket_num = parseInt(part[1]);
   }
@@ -258,7 +258,7 @@ exports.faire_get_ticket = function (msg, res) {
     //WARNING: may change to direct user to bind
     res.send(needValidateMsg(msg));
   }, function (stuID, num) {
-    if (ticket_num == 1) {
+    if (ticket_num == 0) {
       ticket_num = parseInt(num);
     }
     if (usr_lock[stuID] != null) {
@@ -288,7 +288,7 @@ exports.faire_get_ticket = function (msg, res) {
       if (user_info.num + ticket_num > staticACT.activity_info.max_tickets) {
         res.send(template.getPlainTextTemplate(msg,
           "你已经有" + user_info.num + "张票啦，每个人最多" + staticACT.activity_info.max_tickets
-          + "张票哦，再抢会炸的！"));
+          + "张票哦，再抢" + ticket_num + "张会炸的！可以修改默认抢票张数哦 XD"));
         return;
       }
       if (usr_lock[stuID] != null) {
