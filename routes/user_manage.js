@@ -883,6 +883,7 @@ router.post("/detail", function (req, res) {
 
                             db[ACTIVITY_DB].update({_id: idObj}, {$set: activity}, {multi: false}, function (err, result) {
                                 if (docs[0].status == 1) { // Just for the publish activities
+                                    var oldActInfo = docs[0];
                                     all_activity[idObj].set_time(updated_act.book_start, updated_act.book_end);
                                     if (current_activity[updated_act.key] && current_activity[updated_act.key].status > -2) {
                                         lock.acquire('cache' + updated_act.key, function(){
@@ -1015,6 +1016,7 @@ router.post("/detail", function (req, res) {
                                     return;
                                 }
                                 if (updated_act.status == 1) { // Just for the publish activities
+                                    var oldActInfo = docs[0];
                                     all_activity[idObj].set_time(updated_act.book_start, updated_act.book_end);
                                     if (current_activity[updated_act.key] && current_activity[updated_act.key].status > -2) {
                                         lock.acquire('cache' + updated_act.key, function() {

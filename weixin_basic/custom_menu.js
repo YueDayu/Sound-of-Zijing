@@ -3,6 +3,7 @@ var set = require('./settings');
 var at = require('./access_token');
 var act_info = require('./activity_info');
 var ticket_cache = require('../models/ticket_cache');
+var lock = require('../models/lock')
 var later = require('later');
 
 exports.createMenu = createMenu;
@@ -17,6 +18,7 @@ exports.isExit = false;
 var menuStr = JSON.stringify(set.WEIXIN_COSTUM_MENU_TEMPLATE);
 var menuNowUsed;
 
+var createMenu_url = '/cgi-bin/menu/create?access_token=';
 var options_creatMenu = {
     hostname: 'api.weixin.qq.com',
     port: '443',
@@ -29,24 +31,29 @@ var options_creatMenu = {
 };
 
 function createMenu(access_token) {
-    options_creatMenu.path = options_creatMenu.path + access_token;
+    options_creatMenu.path = createMenu_url + access_token;
 
-    var post = https.request(options_creatMenu, function (response) {
-        response.on('data', function (d) {
-            process.stdout.write(d);
-            if (exports.isExit == true)
-                process.exit(0);
+    lock.acquire('menu_api', function() {    
+        var post = https.request(options_creatMenu, function (response) {
+            response.on('data', function (d) {
+                lock.release('menu_api');
+                process.stdout.write(d);
+                if (exports.isExit == true)
+                    process.exit(0);
+            });
+        }).on('error', function (e) {
+            lock.release('menu_api');
+            console.log('Error while createMenu:');
+            console.error(e);
         });
-    }).on('error', function (e) {
-        console.log('Error while createMenu:');
-        console.error(e);
+        post.write(menuStr);
+        post.end();
     });
-    post.write(menuStr);
-    post.end();
 }
 
 //at.getAccessToken(createMenu);
 
+var getMenu_url = '/cgi-bin/menu/get?access_token=';
 var options_getMenu = {
     hostname: 'api.weixin.qq.com',
     port: '443',
@@ -55,7 +62,7 @@ var options_getMenu = {
 };
 
 function getMenu(access_token) {
-    options_getMenu.path = options_getMenu.path + access_token;
+    options_getMenu.path = getMenu_url + access_token;
 
     var request = https.request(options_getMenu, function (response) {
         response.on("data", function (d) {
@@ -69,6 +76,7 @@ function getMenu(access_token) {
 }
 //at.getAccessToken(getMenu);
 
+var deleteMenu_url = '/cgi-bin/menu/delete?access_token=';
 var options_deleteMenu = {
     hostname: 'api.weixin.qq.com',
     port: '443',
@@ -77,7 +85,7 @@ var options_deleteMenu = {
 };
 
 function deleteMenu(access_token) {
-    options_deleteMenu.path = options_deleteMenu.path + access_token;
+    options_deleteMenu.path = deleteMenu_url + access_token;
 
     var request = https.request(options_deleteMenu, function (response) {
         response.on("data", function (d) {
@@ -128,7 +136,7 @@ function autoClearOldMenus(activities) {
 
         buttons.push(JSON.parse(JSON.stringify(Obj)));
     }
-
+   
     var oldMenu = menuStr;
     modifyMenu(buttons);
     if (oldMenu !== menuStr) {
