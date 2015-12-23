@@ -161,7 +161,9 @@ exports.check_set_number = function (msg) {
 
 exports.faire_set_number = function (msg, res) {
   var openID = msg.FromUserName[0];
-  handler_ticket.verifyStu(openID, function (stuID, num) {
+  handler_ticket.verifyStu(openID, function () {
+    res.send(template.getPlainTextTemplate(msg, "请先进行绑定。"));
+  }, function (stuID, num) {
     var ticket_number = parseInt(num);
     var set_number = 1;
     var msg_content;
@@ -195,7 +197,5 @@ exports.faire_set_number = function (msg, res) {
         res.send(template.getPlainTextTemplate(msg, "默认张数设置成功！"));
       });
     });
-  }, function () {
-    res.send(template.getPlainTextTemplate(msg, "请先进行绑定。"));
   });
 };
