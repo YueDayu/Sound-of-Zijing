@@ -10,32 +10,33 @@ var usersHandler = require('./handler_account');
 //never expect it return anything. Every executing function must
 //end up in respond something or a time-out will be gauged.
 var pattern =
-    [
-        [exactHandler.check_get_ticket, exactHandler.faire_get_ticket],
-        //[exactHandler.check_reinburse_ticket, exactHandler.faire_reinburse_ticket],
-        [usersHandler.check_bookable_activity, usersHandler.faire_bookable_activity],
-        [exactHandler.check_list_ticket, exactHandler.faire_list_ticket],
-        [usersHandler.check_bind_accout, usersHandler.faire_bind_accout],
-        [usersHandler.check_unbind_accout, usersHandler.faire_unbind_accout],
-        [usersHandler.check_get_help, usersHandler.faire_get_help],
-        [usersHandler.check_apply_exp, usersHandler.faire_apply_exp]
-    ];
+  [
+    [exactHandler.check_get_ticket, exactHandler.faire_get_ticket],
+    [usersHandler.check_set_number, usersHandler.faire_set_number],
+    //[exactHandler.check_reinburse_ticket, exactHandler.faire_reinburse_ticket],
+    [usersHandler.check_bookable_activity, usersHandler.faire_bookable_activity],
+    [exactHandler.check_list_ticket, exactHandler.faire_list_ticket],
+    [usersHandler.check_bind_accout, usersHandler.faire_bind_accout],
+    [usersHandler.check_unbind_accout, usersHandler.faire_unbind_accout],
+    [usersHandler.check_get_help, usersHandler.faire_get_help],
+    [usersHandler.check_apply_exp, usersHandler.faire_apply_exp]
+  ];
 
 module.exports = function (req, res) {
-    //Attentez! Stipulate that each route result in a sender command.
-    parseString(req.rawData, function (err, result) {
-        if (err) {
-            console.log("+++Error occurs! Reason: Invalid format of wechat input.");
-            res.send("Wrong format.");
-            return;
-        }
-        var msg = result.xml;
-        for (var i = 0; i < pattern.length; i++) {
-            if (pattern[i][0](msg)) {
-                pattern[i][1](msg, res);
-                return;
-            }
-        }
-        res.send(template.getPlainTextTemplate(msg, "对不起，没有合适的指令，请检查你的指令格式是否正确。"));
-    });
+  //Attentez! Stipulate that each route result in a sender command.
+  parseString(req.rawData, function (err, result) {
+    if (err) {
+      console.log("+++Error occurs! Reason: Invalid format of wechat input.");
+      res.send("Wrong format.");
+      return;
+    }
+    var msg = result.xml;
+    for (var i = 0; i < pattern.length; i++) {
+      if (pattern[i][0](msg)) {
+        pattern[i][1](msg, res);
+        return;
+      }
+    }
+    res.send(template.getPlainTextTemplate(msg, "对不起，没有合适的指令，请检查你的指令格式是否正确。"));
+  });
 };
