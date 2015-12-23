@@ -78,7 +78,7 @@ function verifyStudent(openID, ifFail, ifSucc) {
     }
     var part = res.split("_");
     if (part.length <= 1) {
-      part.append("1");
+      part.push("1");
     }
     ifSucc(part[0], part[1]);
   });
