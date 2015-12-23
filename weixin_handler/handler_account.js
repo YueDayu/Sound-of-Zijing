@@ -152,8 +152,8 @@ exports.faire_apply_exp = function (msg, res) {
 //==========================
 exports.check_set_number = function (msg) {
   if (msg.MsgType[0] === "text") {
-    msg = msg.trim();
-    if (msg.split(" ")[0] === "张数")
+    var content = msg.Content[0].trim().split(" ")[0];
+    if (content === "张数")
       return true;
   }
   return checker.checkMenuClick(msg) === basicInfo.WEIXIN_EVENT_KEYS['ticket_default_number'];
