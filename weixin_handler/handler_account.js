@@ -153,7 +153,7 @@ exports.check_set_number = function (msg) {
     if (msg.split(" ")[0] === "张数")
       return true;
   }
-  return false;
+  return checker.checkMenuClick(msg) === basicInfo.WEIXIN_EVENT_KEYS['ticket_default_number'];
 };
 
 exports.faire_set_number = function (msg, res) {
@@ -161,8 +161,14 @@ exports.faire_set_number = function (msg, res) {
   handler_ticket.verifyStu(openID, function (stuID, num) {
     var ticket_number = parseInt(num);
     var set_number = 1;
-    msg = msg.trim();
-    var msg_part = msg.split(" ");
+    var msg_content;
+    if (msg.MsgType[0] === "text") {
+      msg_content = msg.Content[0];
+    } else {
+      msg_content = "张数";
+    }
+    msg_content = msg_content.trim();
+    var msg_part = msg_content.split(" ");
     if (msg_part.length <= 1) {
       res.send(template.getPlainTextTemplate(msg, "您现在的默认抢票张数是" + ticket_number
         + "张，回复“张数 [阿拉伯数字，大于0小于10]”来查询默认张数或者设置默认张数"));
