@@ -47,12 +47,15 @@ exports.faire_unbind_accout = function (msg, res) {
   var openID = msg.FromUserName[0];
   handler_ticket.verifyStu(openID, function () {
     res.send(template.getPlainTextTemplate(msg, "该账号尚未绑定。"));
-  }, function () {
+  }, function (stuid) {
     lock.acquire(USER_DB, function () {
-      redis_db.del(USER_DB + '_' + openID, function () {
-        lock.release(USER_DB);
-        res.send(template.getPlainTextTemplate(msg, "绑定已经解除。"));
-      });
+      redis_db.multi()
+        .del(USER_DB + '_' + openID)
+        .del(USER_DB + '_r_' + stuid)
+        .exec(function () {
+          lock.release(USER_DB);
+          res.send(template.getPlainTextTemplate(msg, "绑定已经解除。"));
+        });
     });
   });
 };
