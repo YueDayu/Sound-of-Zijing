@@ -76,7 +76,11 @@ function verifyStudent(openID, ifFail, ifSucc) {
       ifFail();
       return;
     }
-    ifSucc(res);
+    var part = res.split("_");
+    if (part.length <= 1) {
+      part.append("1");
+    }
+    ifSucc(part[0], part[1]);
   });
 }
 exports.verifyStu = verifyStudent;
@@ -253,7 +257,10 @@ exports.faire_get_ticket = function (msg, res) {
   verifyStudent(openID, function () {
     //WARNING: may change to direct user to bind
     res.send(needValidateMsg(msg));
-  }, function (stuID) {
+  }, function (stuID, num) {
+    if (ticket_num == 1) {
+      ticket_num = parseInt(num);
+    }
     if (usr_lock[stuID] != null) {
       res.send(template.getPlainTextTemplate(msg, "您的抢票请求正在处理中，请稍后通过查票功能查看抢票结果(/▽＼)"));
       return;

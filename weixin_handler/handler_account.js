@@ -158,15 +158,8 @@ exports.check_set_number = function (msg) {
 
 exports.faire_set_number = function (msg, res) {
   var openID = msg.FromUserName[0];
-  handler_ticket.verifyStu(openID, function (res) {
-    var part = res.split("_");
-    var ticket_number = 1;
-    if (part.length > 1) {
-      ticket_number = parseInt(part[1]);
-    }
-    if (!ticket_number) {
-      ticket_number = 1;
-    }
+  handler_ticket.verifyStu(openID, function (stuID, num) {
+    var ticket_number = parseInt(num);
     var set_number = 1;
     msg = msg.trim();
     var msg_part = msg.split(" ");
