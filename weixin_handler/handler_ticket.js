@@ -247,7 +247,7 @@ exports.faire_get_ticket = function (msg, res) {
   if (part.length > 1) {
     ticket_num = parseInt(part[1]);
   }
-  if (!ticket_num) {
+  if (!ticket_num && ticket_num != 0) {
     res.send(template.getPlainTextTemplate(msg,
       "无法解析抢票张数；请使用“抢票 活动代称 [抢票张数（可选，阿拉伯数字）]”的命令或菜单按钮完成指定活动的抢票。"));
     return;
