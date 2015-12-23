@@ -3,6 +3,7 @@ var set = require('./settings');
 var at = require('./access_token');
 var act_info = require('./activity_info');
 var ticket_cache = require('../models/ticket_cache');
+var lock = require('../models/lock')
 var later = require('later');
 
 exports.createMenu = createMenu;
@@ -31,18 +32,22 @@ var options_creatMenu = {
 function createMenu(access_token) {
     options_creatMenu.path = options_creatMenu.path + access_token;
 
-    var post = https.request(options_creatMenu, function (response) {
-        response.on('data', function (d) {
-            process.stdout.write(d);
-            if (exports.isExit == true)
-                process.exit(0);
+    lock.acquire('menu_api', function() {    
+        var post = https.request(options_creatMenu, function (response) {
+            response.on('data', function (d) {
+                lock.release('menu_api');
+                process.stdout.write(d);
+                if (exports.isExit == true)
+                    process.exit(0);
+            });
+        }).on('error', function (e) {
+            lock.release('menu_api');
+            console.log('Error while createMenu:');
+            console.error(e);
         });
-    }).on('error', function (e) {
-        console.log('Error while createMenu:');
-        console.error(e);
+        post.write(menuStr);
+        post.end();
     });
-    post.write(menuStr);
-    post.end();
 }
 
 //at.getAccessToken(createMenu);
@@ -128,7 +133,7 @@ function autoClearOldMenus(activities) {
 
         buttons.push(JSON.parse(JSON.stringify(Obj)));
     }
-
+   
     var oldMenu = menuStr;
     modifyMenu(buttons);
     if (oldMenu !== menuStr) {

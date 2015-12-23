@@ -6,15 +6,15 @@ var ACCESS_TOKEN;
 var AT_UPDATE_TIME = undefined;
 
 exports.getAccessToken = function getAccessToken(callback) {
-    console.log("getAccessToken: AT_UPDATE_TIME=" + AT_UPDATE_TIME);
-
     lock.acquire('getAccessToken', function() {
+        console.log("getAccessToken: AT_UPDATE_TIME=" + AT_UPDATE_TIME);
         var now = new Date();
         if (AT_UPDATE_TIME != undefined
             && now.getYear() == AT_UPDATE_TIME.getYear()
             && now.getMonth() == AT_UPDATE_TIME.getMonth()
             && now.getDay() == AT_UPDATE_TIME.getDay()
             && (now.getHours() - AT_UPDATE_TIME.getHours()) <= 1) {
+            lock.release('getAccessToken');
             callback(ACCESS_TOKEN);
         }
         else {

@@ -21,7 +21,9 @@ var refundticket = require('./routes/refund_ticket');
 
 var ticket_cache = require('./models/ticket_cache');
 
-var wx_custom_menu = require('./weixin_basic/custom_menu');
+var urls = require('./address_configure');
+var act_info = require('./weixin_basic/activity_info');
+var cm = require('./weixin_basic/custom_menu');
 
 var app = express();
 
@@ -100,4 +102,6 @@ module.exports = app;
 
 ticket_cache.load_not_end_activity();
 
-wx_custom_menu.setMenuTimer();
+if (urls.autoRefresh) {
+    act_info.getCurrentActivity(cm.autoClearOldMenus);
+}
