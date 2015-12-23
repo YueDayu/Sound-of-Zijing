@@ -45,6 +45,12 @@ var all_activity = {};
 exports.all_activity = all_activity;
 
 /*
+the list of activities to appear in custom menu
+*/
+var menu_activity = [];
+exports.menu_activity = menu_activity;
+
+/*
  load not end activities to the list.
  may need load data from temp file.
  */
@@ -171,12 +177,14 @@ var activity_cache = function (activity_key, book_start, book_end) {
                             console.log('pre-load is finished! key: ' + this.activity_key);
                             current_activity[this.activity_key].status = -1;
                             lock.release('cache' + this.activity_key);
+                            menu_activity.push(this.activity_info);
                             this.restore_from_file();
                         }.bind(this));
                     } else { // finished
                         console.log('pre-load is finished! key: ' + this.activity_key);
                         current_activity[this.activity_key].status = -1;
                         lock.release('cache' + this.activity_key);
+                        menu_activity.push(this.activity_info);
                         this.restore_from_file();
                     }
                 }.bind(this));
@@ -254,13 +262,19 @@ var activity_cache = function (activity_key, book_start, book_end) {
     };
 
     this.restore_events = function () {
+        if (current_activity[this.activity_key].status > 0) {
+            var menu_index = menu_activity.indexOf(this.activity_info);
+            if (menu_index != -1) {
+                menu_activity.splice(menu_index, 1);
+            }
+        }
         if (current_activity[this.activity_key].status == 2) {
             return;
         }
         if (this.save_file_timer === null) {
             this.save_file_timer = later.setInterval(function() {
                 this.save_to_file();
-            }.bind(this), later.parse.recur().every(31).second().after(1).second(), this);
+            }.bind(this), later.parse.recur().every(31).minute().after(1).minute(), this);
         }
         if (current_activity[this.activity_key].status == -1 && moment(parseInt(this.activity_info.book_start)).isBefore()) {
             this.book_start_event();
@@ -275,6 +289,7 @@ var activity_cache = function (activity_key, book_start, book_end) {
 
     // TODO: disable the time which saved files.
     this.book_end_event = function () {
+        console.log("activity " + this.activity_key + " book_end");
         lock.acquire('cache' + this.activity_key, function () {
             if (current_activity[this.activity_key].status == 0) {
                 current_activity[this.activity_key].status = 1;
@@ -284,10 +299,14 @@ var activity_cache = function (activity_key, book_start, book_end) {
             }
             lock.release('cache' + this.activity_key);
             this.save_to_file();
+            var menu_index = menu_activity.indexOf(this.activity_info);
+            if (menu_index != -1) {
+                menu_activity.splice(menu_index, 1);
+            }
             if (this.save_file_timer === null) {
                 this.save_file_timer = later.setInterval(function() {
                     this.save_to_file();
-                }.bind(this), later.parse.recur().every(31).minute().after(1).second(), this);
+                }.bind(this), later.parse.recur().every(31).minute().after(1).minute(), this);
             }
         }.bind(this));
     };
@@ -303,7 +322,7 @@ var activity_cache = function (activity_key, book_start, book_end) {
             } else {
                 console.log('error on save back. key: ' + this.activity_key);
                 lock.release('cache' + this.activity_key);
-                return;
+                 return;
             }
             var save_item_num = this.all_ticket_num - this.activity_info.remain_tickets + 1;
             if (this.activity_info.need_seat != 0) { // save sear data.

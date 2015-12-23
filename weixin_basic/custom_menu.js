@@ -2,12 +2,15 @@ var https = require('https');
 var set = require('./settings');
 var at = require('./access_token');
 var act_info = require('./activity_info');
+var ticket_cache = require('../models/ticket_cache');
+var later = require('later');
 
 exports.createMenu = createMenu;
 exports.getMenu = getMenu;
 exports.deleteMenu = deleteMenu;
 exports.modifyMenu = modifyMenu;
 exports.autoClearOldMenus = autoClearOldMenus;
+exports.setMenuTimer = setMenuTimer;
 exports.menuStr = menuStr;
 exports.isExit = false;
 
@@ -35,6 +38,7 @@ function createMenu(access_token) {
                 process.exit(0);
         });
     }).on('error', function (e) {
+        console.log('Error while createMenu:');
         console.error(e);
     });
     post.write(menuStr);
@@ -95,6 +99,7 @@ function modifyMenu(buttons) {
 }
 
 function autoClearOldMenus(activities) {
+    console.log(activities);
     buttons = [];
     Obj = {};
     while (activities.length > 4) {
@@ -124,6 +129,19 @@ function autoClearOldMenus(activities) {
         buttons.push(JSON.parse(JSON.stringify(Obj)));
     }
 
+    var oldMenu = menuStr;
     modifyMenu(buttons);
-    at.getAccessToken(createMenu);
+    if (oldMenu !== menuStr) {
+        console.log("Menu modified");
+        at.getAccessToken(createMenu);
+    }
+}
+
+var menu_timer = null;
+function setMenuTimer() {
+    if (menu_timer == null) {
+        later.setInterval(function() {
+            autoClearOldMenus(ticket_cache.menu_activity);
+        }, later.parse.recur().every(3).minute());
+    }
 }

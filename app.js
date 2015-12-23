@@ -20,6 +20,8 @@ var acquireid = require('./routes/acquireid');
 
 var ticket_cache = require('./models/ticket_cache');
 
+var wx_custom_menu = require('./weixin_basic/custom_menu');
+
 var app = express();
 
 process.on('uncaughtException', function(err)
@@ -95,3 +97,5 @@ app.use(function(err, req, res, next) {
 module.exports = app;
 
 ticket_cache.load_not_end_activity();
+
+wx_custom_menu.setMenuTimer();
