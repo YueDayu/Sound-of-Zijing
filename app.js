@@ -17,6 +17,7 @@ var chooseat = require('./routes/choose_seat');
 var chooarea = require('./routes/choose_area');
 var logout = require('./routes/logout');
 var acquireid = require('./routes/acquireid');
+var refundticket = require('./routes/refund_ticket');
 
 var ticket_cache = require('./models/ticket_cache');
 
@@ -55,6 +56,7 @@ app.use('/login', login);
 app.use('/validate', validate);
 app.use('/logout', logout);
 app.use('/acquireid', acquireid);
+app.use('/refundticket', refundticket);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

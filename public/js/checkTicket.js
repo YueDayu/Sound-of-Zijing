@@ -80,7 +80,7 @@ function displayButton() {
 }
 
 function refundConfirm() {
-    var info = "复制以下文字已经到剪贴板，然后回到微信公众号页面粘贴并发送，即可退票。" +
+/*    var info = "复制以下文字已经到剪贴板，然后回到微信公众号页面粘贴并发送，即可退票。" +
             "<br><br><input id='input_refund_info' value = '退票 " + ticket.refund_id + "'>";
     $("#alertInfo").html(info);
     $("#alertFrame").css("display", "inherit");
@@ -91,7 +91,14 @@ function refundConfirm() {
     $("#input_refund_info").click(function() {
         $("#alertFrame").css("display", "none");
         prompt("复制以下文字并发送给我们的公众号",'退票 '+ ticket.refund_id);
-    });
+    });*/
+    if (confirm("确认退票？")) {
+        $.post("/refundticket", {'refund_id': ticket.refund_id, 'stu_id': ticket.stu_id}, function(res) {
+            alert(res);
+        });
+    } else {
+        return;
+    }
 }
 
 function isIE() {

@@ -5,7 +5,7 @@ var lock = require('../models/lock');
 
 var encoder = require("../weixin_handler/handler_ticket").encode_refund_id;
 
-var cache = require('../models/ticket_cache.js');
+var cache = require('../models/ticket_cache');
 var all_activity = cache.all_activity;
 var current_activity = cache.current_activity;
 
@@ -178,7 +178,8 @@ router.get('/', function (req, res) {
                 ticket_status: ticket_status,
                 ticket_price: ticket_info.cost,
                 has_paid: (ticket_info.cost == 0 || ticketstatus == 2),
-                act_book_end: getTime(be)
+                act_book_end: getTime(be),
+                stu_id: student_id
             });
         }
     } else { // if not
@@ -255,7 +256,8 @@ router.get('/', function (req, res) {
                             ticket_status: ticket_status,
                             ticket_price: docs[0].cost,
                             has_paid: (docs[0].cost == 0 || ticketstatus == 2),
-                            act_book_end: getTime(be)
+                            act_book_end: getTime(be),
+                            stu_id: ""
                         });
                     }
                 });
