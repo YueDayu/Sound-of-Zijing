@@ -460,3 +460,7 @@ exports.faire_list_ticket = function (msg, res) {
       });
   });
 };
+
+
+exports.verifyActivities = verifyActivities;
+exports.decode_refund_id = decode_refund_id;
